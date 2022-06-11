@@ -1,0 +1,14 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+*.session
+*.session-journal
+*.db
+venv/
+venv.bak/
+.idea/
+logs/
+
+night_messages.json
+settings.json
+unknown_errors.txt

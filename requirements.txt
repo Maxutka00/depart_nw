@@ -1,0 +1,14 @@
+Pyrogram
+APScheduler
+loguru
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+oauth2client
+TgCrypto
+httplib2
+requests
+beautifulsoup4
+lxml
+Pillow
+cssutils

@@ -1,0 +1,69 @@
+import asyncio
+import os
+import re
+
+from pyrogram import filters, Client, enums
+from loguru import logger
+from pyrogram.enums import ParseMode
+from pyrogram.types import Message, CallbackQuery, InputMedia, InputMediaPhoto
+
+import func.translit
+from keyboards.inline import electric_transport_kb
+
+
+async def message_deleter(message, time: int = 180):
+    await asyncio.sleep(time)
+    try:
+        await message.delete()
+    except Exception:
+        pass
+
+
+troll_nn = r"(^|\b)((тро(лл|л)ейбус +(\d+|А|Б))|(трамвай +\d+))|(((\d+|А|Б) +тро(лл|л)ейбус)|(\d+ +трамвай))(^|\b)"
+
+
+@Client.on_message(filters.regex(troll_nn, re.I))
+async def tram_troll_request(app: Client, message: Message):
+    for match in message.matches:
+        logger.info(
+            f'user_id = {message.from_user.id} | first_name = {message.from_user.first_name} | last_name = {message.from_user.last_name} | number_route = {match.group()}')
+        num = None
+        names = {"троллейбус": "trol", "тролейбус": "trol", "трамвай": "tram"}
+        letters = {"б": "b", "а": "a"}
+        for element in match.group().split():
+            if element.isdigit() or element.lower() in letters:
+                num = letters.get(element.lower(), None) or element
+            else:
+                name = names.get(element.lower())
+        kb = electric_transport_kb(name, num)
+        if kb is None:
+            photo = list(filter(lambda x: x.startswith(f"{num}{name}"), os.listdir(os.path.join("parsing", "photos"))))
+            if not photo:
+                return
+            else:
+                photo = os.path.join("parsing", "photos", photo[0])
+                caption = ''
+        else:
+            photo = os.path.join("data", "stop_choose.png")
+            caption = ""
+        mes = await app.send_photo(message.chat.id, photo,
+                                   caption=caption,
+                                   reply_to_message_id=message.reply_to_message_id or message.id,
+                                   parse_mode=ParseMode.HTML,
+                                   reply_markup=kb)
+        if await filters.group_filter(0, app, message):
+            await asyncio.create_task(message_deleter(mes))
+            if message.text == match.group():
+                await asyncio.create_task(message_deleter(message))
+
+
+@Client.on_callback_query(filters.regex(r"(\d+|a|b)(trol|tram)", re.I))
+async def change_stop(app: Client, callback_query: CallbackQuery):
+    del_kb = True
+    text = callback_query.data.replace(callback_query.matches[0].group(), '')
+    text = func.translit.translit(text, True).replace('"', "'").replace("\\", "bsl").replace("/", "sl")
+    photo = os.path.join("parsing", "photos", callback_query.matches[0].group() + text + '.png')
+    if del_kb:
+        await callback_query.message.edit_reply_markup(None)
+    await callback_query.message.edit_media(InputMediaPhoto(photo))
+
