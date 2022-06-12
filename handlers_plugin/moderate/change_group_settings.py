@@ -247,7 +247,11 @@ async def change_settings(app: Client, message: Message):
                 return
     elif command == "auto_delete" and len(message.text.split(maxsplit=2)) >= 3:
         if args[1] == "get":
-            pass
+            timetable = db.get_auto_delete_timetables_time(message.chat.id)
+            commands_time = db.get_auto_delete_commands_time(message.chat.id)
+            await app.send_message(message.from_user.id, f"<b>Атоудаление:</b>\nРасписания: {'никогда' if timetable == 0 else str(timetable)+'сек'}\nКоманд: {'никогда' if timetable == 0 else str(commands_time)+'сек'}")
+            mes = await message.reply("Отправил в лс")
+            await auto_delete.delete_command([mes, message])
         else:
             if len(message.text.split()) >= 4 and args[2].isdigit():
                 if args[1] == "command":

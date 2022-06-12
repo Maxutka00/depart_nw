@@ -5,13 +5,14 @@ from pyrogram.enums import ChatType
 from pyrogram.types import Message
 
 import db
+from func import auto_delete
 
 
 @Client.on_message(filters.command("start"))
 async def start(app, message: Message):
     logger.info(
         f'user_id = {message.from_user.id} | first_name = {message.from_user.first_name} | last_name = {message.from_user.last_name} | used !start is private chat')
-    await app.send_message(chat_id=message.chat.id, text='''Щоб дізнатись розклад Автобусного маршруту напишіть:
+    mes = await app.send_message(chat_id=message.chat.id, text='''Щоб дізнатись розклад Автобусного маршруту напишіть:
 Автобус [номер Автобуса]
 — Автобус 151а
 — Автобус 77
@@ -39,3 +40,4 @@ async def start(app, message: Message):
             async for m in app.get_chat_members(message.chat.id, filter=enums.ChatMembersFilter.ADMINISTRATORS):
                 administrators.append(m.user.id)
             db.add_chat(message.chat.id, administrators)
+    await auto_delete.delete_command([message, mes])
