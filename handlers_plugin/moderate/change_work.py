@@ -33,3 +33,5 @@ async def ping(app: Client, message: Message):
         data = json.load(f)
     await mes.edit(
         f"<b>Ping:</b> {round(b - a, 3)}sec.\nСтатус: {'бот работает нормально' if data['work'] else 'бот на тех обслуживании'}")
+    await auto_delete.delete_command([mes, message])
+    return
