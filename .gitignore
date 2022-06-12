@@ -8,6 +8,7 @@ venv/
 venv.bak/
 .idea/
 logs/
+photos/
 
 night_messages.json
 settings.json

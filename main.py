@@ -18,6 +18,8 @@ if not os.path.exists(os.path.join("data", "night_messages.json")):
 if not os.path.exists(os.path.join("data", "settings.json")):
     with open(os.path.join("data", "settings.json"), "w") as f:
         f.write('{"work": true}')
+if not os.path.exists(os.path.join("parsing", "photos")):
+    os.mkdir(os.path.join("parsing", "photos"))
 
 plugins = dict(
     root="handlers_plugin",

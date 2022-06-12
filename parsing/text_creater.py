@@ -42,7 +42,7 @@ def get_text(num: str, transport_type):
             interval_time = ['7:00-9:00', '9:00-16:00', '16:00-19:00']
             for i in range(len(intervals)):
                 interval = 'не известно' if intervals[i] == '' else intervals[0]
-                text.append(f"{interval_time[i]} - {interval}мин ")
+                text.append(f"{interval_time[i]} - {interval}хв")
         if data[4] and all_data.index(data) != len(all_data)-1:
             text.append("———————————————————————————")
     text.append("\nМожливі відхилення від інтервалів руху у зв'язку з браком палива.\nПо роботі бота писати @VAEZAN453534")
