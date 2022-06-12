@@ -329,7 +329,7 @@ def get_auto_delete_commands_time(chat_id: int):
 def get_auto_delete_timetables_time(chat_id: int):
     with sqlite3.connect(os.path.join('data', "data.db")) as conn:
         cursor = conn.cursor()
-        data = cursor.execute("""SELECT auto_delete_timetables FROM chats WHERE id = ?""", (chat_id,))
+        data = cursor.execute("""SELECT auto_delete_timetables_time FROM chats WHERE id = ?""", (chat_id,))
         return data.fetchone()[0]
 
 
@@ -343,7 +343,7 @@ def set_auto_delete_commands_time(chat_id: int, seconds: int):
 def set_auto_delete_timetables_time(chat_id: int, seconds: int):
     with sqlite3.connect(os.path.join('data', "data.db")) as conn:
         cursor = conn.cursor()
-        cursor.execute("""UPDATE chats SET auto_delete_timetables = ? WHERE id = ?""", (seconds, chat_id))
+        cursor.execute("""UPDATE chats SET auto_delete_timetables_time = ? WHERE id = ?""", (seconds, chat_id))
         conn.commit()
 
 

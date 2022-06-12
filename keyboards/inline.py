@@ -9,6 +9,7 @@ def electric_transport_kb(transport: Literal["trol", "tram"], num: str) -> Optio
     files = list(filter(lambda x: x.startswith(f"{num}{transport}"), os.listdir(os.path.join("parsing", "photos"))))
     if len(files) == 1:
         return None
+    files.sort(key=lambda x: os.path.getmtime(os.path.join("parsing", "photos", x)))
     kb = []
     for file in files:
         file = file.replace(".png", "").replace("'", '"').replace("bsl", "\\").replace("sl", "/")
