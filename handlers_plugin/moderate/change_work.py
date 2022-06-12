@@ -18,9 +18,11 @@ async def change_work(app: Client, message: Message):
     await message.reply(
         f"Успешно изменён режим: {'бот работает нормально' if data['work'] else 'бот на тех обслуживании'}")
     try:
-        await app.send_message(config.chat_dp_id, "Просимо вибачення бот тимчасово відключено\n\nЗ однієї або кількох причин:\n— Вийшла з ладу одна з функцій\n- профілактичні виправлення текстів\n- Зміна даних та конфігурації або коду.")
+        await app.send_message(config.chat_dp_id,
+                               "Просимо вибачення бот тимчасово відключено\n\nЗ однієї або кількох причин:\n— Вийшла з ладу одна з функцій\n- профілактичні виправлення текстів\n- Зміна даних та конфігурації або коду.")
     except Exception as e:
         print(e)
+
 
 @Client.on_message(filters.command("ping"))
 async def ping(app: Client, message: Message):

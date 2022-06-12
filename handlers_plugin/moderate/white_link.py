@@ -5,6 +5,8 @@ from pyrogram.errors import UserAdminInvalid, ChannelInvalid, ChatAdminRequired
 from pyrogram.types import ChatPermissions
 
 import costum_filters
+import db
+from func import auto_delete
 
 
 @Client.on_message(costum_filters.link_filter)
@@ -26,14 +28,12 @@ async def white_list_link(app, message):
     try:
         await app.restrict_chat_member(message.chat.id, message.reply_to_message.from_user.id, ChatPermissions(),
                                        datetime.now() + timedelta(hours=hours))
-    except (UserAdminInvalid, ChatAdminRequired):
-        await message.reply('Варн добавлен, но у бота нет прав на мут')
-        punishment = "нет"
-    except ChannelInvalid:
-        await message.reply('Варн добавлен, но мут работает только в супергруппах')
+    except Exception:
         punishment = "нет"
     else:
         punishment = f"мут {hours}ч."
-    await app.send_message(message.chat.id,
+    mes = await app.send_message(message.chat.id,
                            f"Вам был выдан варн. Всего их у вас {num_warn}\nПричина: отправлена ссылка\nНаказание: {punishment}",
                            reply_to_message_id=message.reply_to_message_id)
+    await auto_delete.delete_command([mes, message])
+    return

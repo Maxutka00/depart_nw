@@ -8,6 +8,7 @@ from pyrogram.types import Message, ChatPermissions, CallbackQuery
 
 import costum_filters
 import db
+from func import auto_delete
 from keyboards.inline import del_mute_kb
 
 
@@ -33,25 +34,31 @@ async def report(app: Client, message: Message):
                                    f"Вызов администрации\nКоманду вызвал: {message.from_user.mention}\n\nСсылка на сообщение:\n{message.link}")
         except Exception as e:
             print(e)
+    mes = await message.reply("Ваше сообщение было доставлено администрации")
+    messages = [mes, message]
+    await auto_delete.delete_command(messages)
 
 
 @Client.on_message(filters.command(["warn", "w"], prefixes=["/",
                                                             "!"]) & filters.group & filters.reply & costum_filters.chat_admin_filter)
 async def warn(app: Client, message: Message):
+    mes1 = None
     if len(message.command) < 2:
         mes = await message.reply("Вы не указали аргументы")
-        await asyncio.create_task(message_deleter(mes, 10))
-        await asyncio.create_task(message_deleter(message, 10))
+        await auto_delete.delete_command([mes, message], 10)
         return
     arg = message.command[1]
     if arg == 'del' and len(message.command) > 2:
         if not message.command[2].isdigit():
-            return await message.reply("Неверный номер варна")
+            mes = await message.reply("Неверный номер варна")
+            await auto_delete.delete_command([mes, message], 10)
+            return
         status = db.del_warn(message.chat.id, message.reply_to_message.from_user.id, int(message.command[2]))
         if status:
-            await message.reply("Варн успешно удалён", reply_markup=del_mute_kb(message.reply_to_message.from_user.id))
+            mes = await message.reply("Варн успешно удалён",
+                                      reply_markup=del_mute_kb(message.reply_to_message.from_user.id))
         else:
-            await message.reply("Нoмер варна указан не верно")
+            mes = await message.reply("Нoмер варна указан не верно")
     else:
         reason = message.text.split(maxsplit=1)[1]
         num_warn = db.add_warn(message.chat.id, message.reply_to_message.from_user.id, reason)
@@ -68,16 +75,17 @@ async def warn(app: Client, message: Message):
             await app.restrict_chat_member(message.chat.id, message.reply_to_message.from_user.id, ChatPermissions(),
                                            datetime.now() + timedelta(hours=hours))
         except (UserAdminInvalid, ChatAdminRequired):
-            await message.reply('Варн добавлен, но у бота нет прав на мут')
+            mes1 = await message.reply('Варн добавлен, но у бота нет прав на мут')
             punishment = "нет"
         except ChannelInvalid:
-            await message.reply('Варн добавлен, но мут работает только в супергруппах')
+            mes1 = await message.reply('Варн добавлен, но мут работает только в супергруппах')
             punishment = "нет"
         else:
             punishment = f"мут {hours}ч."
-        await app.send_message(message.chat.id,
-                               f"Вам был выдан варн. Всего их у вас {num_warn}\nПричина: {reason}\nНаказание: {punishment}",
-                               reply_to_message_id=message.reply_to_message_id)
+        mes = await app.send_message(message.chat.id,
+                                     f"Вам был выдан варн. Всего их у вас {num_warn}\nПричина: {reason}\nНаказание: {punishment}",
+                                     reply_to_message_id=message.reply_to_message_id)
+    await auto_delete.delete_command([mes, message, mes1])
 
 
 @Client.on_message(
@@ -91,7 +99,8 @@ async def info(app: Client, message: Message):
     for num, warn in enumerate(warns, start=1):
         text_warns.append(f"{num}. {warn}")
     text_warns = '\n'.join(text_warns)
-    await message.reply(f"{text}\n\nВарны:\n{text_warns}")
+    mes = await message.reply(f"{text}\n\nВарны:\n{text_warns}")
+    await auto_delete.delete_command([mes, message])
 
 
 @Client.on_callback_query(filters.regex(r"unmute_\d+", re.I) & costum_filters.chat_admin_filter)

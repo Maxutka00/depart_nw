@@ -18,7 +18,9 @@ def prepare_db():
         night_mode_on TEXT,/*23 00*/
         night_mode_off TEXT,/*5 00*/
         night_mode_status INTEGER, /*1-вкл, 0-выкл*/
-        report_chat INTEGER/*если 0 то отправляется всем админам*/
+        report_chat INTEGER,/*если 0 то отправляется всем админам*/
+        auto_delete_commands INTEGER,/*время автоудаления команд в сек, 0 = не удалять*/
+        auto_delete_timetables INTEGER/*время автоудаления расписания в сек, 0 = не удалять*/
         );/*Это просто были примеры*/
         CREATE TABLE IF NOT EXISTS warns(
         chat_id INTEGER,
@@ -38,8 +40,8 @@ def prepare_db():
         if chat is not None:
             return
         args = (config.chat_dp_id, ' '.join(list(map(str, config.default_admins))), ';'.join(config.links_whitelist), 1,
-                ';'.join(config.words_blacklist), '23 00', '5 00', 1, config.report_chat_dp)
-        cursor.execute("""INSERT INTO chats VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)""", args)
+                ';'.join(config.words_blacklist), '23 00', '5 00', 1, config.report_chat_dp, 120, 600)
+        cursor.execute("""INSERT INTO chats VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", args)
         conn.commit()
 
 
@@ -78,9 +80,15 @@ def add_chat(chat_id: int, admins: List, ):
         cursor = conn.cursor()
         chat = cursor.execute("SELECT * FROM chats WHERE id=?", (chat_id,)).fetchone()
         if chat is None:
-            args = (chat_id, ' '.join(list(map(str, admins))), '', 0,
-                    '', '23 00', '5 00', 0, 0)
-            cursor.execute("""INSERT INTO chats VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)""", args)
+            if chat_id != config.chat_dp_id:
+                args = (chat_id, ' '.join(list(map(str, admins))), '', 0,
+                        '', '23 00', '5 00', 0, 0, 0, 0)
+            else:
+                args = (
+                    config.chat_dp_id, ' '.join(list(map(str, config.default_admins))),
+                    ';'.join(config.links_whitelist), 1,
+                    ';'.join(config.words_blacklist), '23 00', '5 00', 1, config.report_chat_dp, 120, 600)
+            cursor.execute("""INSERT INTO chats VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", args)
             conn.commit()
             return True
         else:
@@ -306,6 +314,36 @@ def set_report_chat(chat_id: int, report_chat: int):
     with sqlite3.connect(os.path.join('data', "data.db")) as conn:
         cursor = conn.cursor()
         cursor.execute("""UPDATE chats SET report_chat = ? WHERE id = ?""", (report_chat, chat_id))
+        conn.commit()
+
+
+###############
+
+def get_auto_delete_commands_time(chat_id: int):
+    with sqlite3.connect(os.path.join('data', "data.db")) as conn:
+        cursor = conn.cursor()
+        data = cursor.execute("""SELECT auto_delete_commands_time FROM chats WHERE id = ?""", (chat_id,))
+        return data.fetchone()[0]
+
+
+def get_auto_delete_timetables_time(chat_id: int):
+    with sqlite3.connect(os.path.join('data', "data.db")) as conn:
+        cursor = conn.cursor()
+        data = cursor.execute("""SELECT auto_delete_timetables FROM chats WHERE id = ?""", (chat_id,))
+        return data.fetchone()[0]
+
+
+def set_auto_delete_commands_time(chat_id: int, seconds: int):
+    with sqlite3.connect(os.path.join('data', "data.db")) as conn:
+        cursor = conn.cursor()
+        cursor.execute("""UPDATE chats SET auto_delete_commands_time = ? WHERE id = ?""", (seconds, chat_id))
+        conn.commit()
+
+
+def set_auto_delete_timetables(chat_id: int, seconds: int):
+    with sqlite3.connect(os.path.join('data', "data.db")) as conn:
+        cursor = conn.cursor()
+        cursor.execute("""UPDATE chats SET auto_delete_timetables = ? WHERE id = ?""", (seconds, chat_id))
         conn.commit()
 
 

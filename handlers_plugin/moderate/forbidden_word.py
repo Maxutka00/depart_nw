@@ -8,6 +8,7 @@ from pyrogram.types import ChatPermissions
 
 import db
 from costum_filters import words_blacklist_filter
+from func import auto_delete
 
 
 @Client.on_message(words_blacklist_filter & ~filters.forwarded)
@@ -31,14 +32,12 @@ async def text_mat(app, message):
     try:
         await app.restrict_chat_member(message.chat.id, message.reply_to_message.from_user.id, ChatPermissions(),
                                        datetime.now() + timedelta(hours=hours))
-    except (UserAdminInvalid, ChatAdminRequired):
-        await message.reply('Варн добавлен, но у бота нет прав на мут')
-        punishment = "нет"
-    except ChannelInvalid:
-        await message.reply('Варн добавлен, но мут работает только в супергруппах')
+    except Exception:
         punishment = "нет"
     else:
         punishment = f"мут {hours}ч."
-    await app.send_message(message.chat.id,
-                       f"Вам был выдан варн. Всего их у вас {num_warn}\nПричина: использовано запрещённое слово\nНаказание: {punishment}",
-                       reply_to_message_id=message.reply_to_message_id)
+    mes = await app.send_message(message.chat.id,
+                           f"Вам был выдан варн. Всего их у вас {num_warn}\nПричина: использовано запрещённое слово\nНаказание: {punishment}",
+                           reply_to_message_id=message.reply_to_message_id)
+    await message.delete()
+    await auto_delete.delete_command([mes])

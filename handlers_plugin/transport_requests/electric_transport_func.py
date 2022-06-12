@@ -8,6 +8,7 @@ from pyrogram.enums import ParseMode
 from pyrogram.types import Message, CallbackQuery, InputMedia, InputMediaPhoto
 
 import func.translit
+from func import auto_delete
 from keyboards.inline import electric_transport_kb
 
 
@@ -51,10 +52,10 @@ async def tram_troll_request(app: Client, message: Message):
                                    reply_to_message_id=message.reply_to_message_id or message.id,
                                    parse_mode=ParseMode.HTML,
                                    reply_markup=kb)
-        if await filters.group_filter(0, app, message):
-            await asyncio.create_task(message_deleter(mes))
-            if message.text == match.group():
-                await asyncio.create_task(message_deleter(message))
+        messages = [mes]
+        if message.text == match.group():
+            messages.append(message)
+        await auto_delete.delete_timetable(messages)
 
 
 @Client.on_callback_query(filters.regex(r"(\d+|a|b)(trol|tram)", re.I))

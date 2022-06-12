@@ -1,16 +1,20 @@
 from loguru import logger
 from pyrogram import filters
 from pyrogram import Client
+from pyrogram.types import Message
 
 import config
 from costum_filters import chat_admin_filter
+from func import auto_delete
 
 
 @Client.on_message(filters.command("del", prefixes=config.prefix) & chat_admin_filter)
-async def dels(app, message):
-	logger.info(f'user_id = {message.from_user.id} | first_name = {message.from_user.first_name} | last_name = {message.from_user.last_name} | used !del')
-	await app.delete_messages(message.chat.id, message.id)
-	if message.reply_to_message:
-		await app.delete_messages(message.chat.id, message.reply_to_message.id)
-	else:
-		await message.reply("Вы не ответили на сообщение")
+async def dels(app: Client, message: Message):
+    logger.info(
+        f'user_id = {message.from_user.id} | first_name = {message.from_user.first_name} | last_name = {message.from_user.last_name} | used !del')
+    if message.reply_to_message:
+        await app.delete_messages(message.chat.id, [message.reply_to_message_id, message.id])
+    else:
+        mes = await message.reply("Вы не ответили на сообщение")
+        await auto_delete.delete_command([mes, message])
+        return

@@ -10,7 +10,6 @@ from parsing import parse
 @Client.on_message(filters.command("parse") & filters.user(config.default_admins))
 async def start_parse(app: Client, message: Message):
     await message.delete()
-    a = time.time()
     try:
         parse.transport_parse()
     except Exception as e:
