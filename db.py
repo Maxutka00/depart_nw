@@ -40,7 +40,7 @@ def prepare_db():
         if chat is not None:
             return
         args = (config.chat_dp_id, ' '.join(list(map(str, config.default_admins))), ';'.join(config.links_whitelist), 1,
-                ';'.join(config.words_blacklist), '23 00', '5 00', 1, config.report_chat_dp, 120, 600)
+                ';'.join(config.words_blacklist), '23 00', '5 00', 1, config.report_chat_dp, 120, 900)
         cursor.execute("""INSERT INTO chats VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", args)
         conn.commit()
 
@@ -87,7 +87,7 @@ def add_chat(chat_id: int, admins: List, ):
                 args = (
                     config.chat_dp_id, ' '.join(list(map(str, config.default_admins))),
                     ';'.join(config.links_whitelist), 1,
-                    ';'.join(config.words_blacklist), '23 00', '5 00', 1, config.report_chat_dp, 120, 600)
+                    ';'.join(config.words_blacklist), '23 00', '5 00', 1, config.report_chat_dp, 120, 900)
             cursor.execute("""INSERT INTO chats VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", args)
             conn.commit()
             return True
