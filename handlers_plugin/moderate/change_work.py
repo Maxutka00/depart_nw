@@ -6,6 +6,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 
 import config
+from func import auto_delete
 
 
 @Client.on_message(filters.command("repair") & filters.user([1398764450]))
