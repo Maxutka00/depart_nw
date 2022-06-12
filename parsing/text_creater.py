@@ -14,12 +14,14 @@ def get_text(num: str, transport_type):
     text = []
     if not all_data:
         for symbol in num:
-            if not num.isdigit():
+            if not symbol.isdigit():
                 num = num.replace(symbol, '')
         if int(num) < 177:
             txt = "Ви помилились, цей маршрут відсутній серед маршрутів міста.\nНапишіть правильний номер маршруту, будь ласка."
-        if int(num) > 177:
+        elif int(num) > 177:
             txt = 'Даний маршрут не входить у маршрутну сітку міста Дніпро і, на жаль, ми не змогли отримати інформацію щодо його розкладу. Щоб дізнатись його розклад спробуйте зателефонувати на гарячу лінію ОДА за безкоштовним номером - 0800505600'
+        else:
+            return
         return f"{transport_type} {num}\n\n{txt}"
     text.append(f"<b>{transport_type} {num}</b>")
     for data in all_data:
