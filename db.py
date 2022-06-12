@@ -340,7 +340,7 @@ def set_auto_delete_commands_time(chat_id: int, seconds: int):
         conn.commit()
 
 
-def set_auto_delete_timetables(chat_id: int, seconds: int):
+def set_auto_delete_timetables_time(chat_id: int, seconds: int):
     with sqlite3.connect(os.path.join('data', "data.db")) as conn:
         cursor = conn.cursor()
         cursor.execute("""UPDATE chats SET auto_delete_timetables = ? WHERE id = ?""", (seconds, chat_id))

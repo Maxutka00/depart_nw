@@ -19,7 +19,8 @@ settings_commands = {
     "night_mode": ["[start или stop] [зачение]", "[enable или disable]"],
     "links_whitelist": ["[add или del] [зачения разделяя ;]", "[enable или disable]"],
     "blacklist": ["[add или del] [зачения разделяя ;]"],
-    "report": ["[тег или id группы или юзера (0 = всем администраторам)]"]
+    "report": ["[тег или id группы или юзера (0 = всем администраторам)]"],
+    "auto_delete": ["[command или timetable] [время в сек]"]
 }
 
 
@@ -244,6 +245,29 @@ async def change_settings(app: Client, message: Message):
                 mes = await message.reply("Успешно")
                 await auto_delete.delete_command([mes, message])
                 return
+    elif command == "auto_delete" and len(message.text.split(maxsplit=2)) >= 3:
+        if args[1] == "get":
+            pass
+        else:
+            if len(message.text.split()) >= 4 and args[2].isdigit():
+                if args[1] == "command":
+                    db.set_auto_delete_commands_time(message.chat.id, int(args[2]))
+                    mes = await message.reply("Успешно")
+                    await auto_delete.delete_command([mes, message])
+                    return
+                elif args[1] == "timetable":
+                    db.set_auto_delete_timetables_time(message.chat.id, int(args[2]))
+                    mes = await message.reply("Успешно")
+                    await auto_delete.delete_command([mes, message])
+                    return
+                else:
+                    mes = await message.reply("Нет такого аргумента\n/help для показа всех команд")
+                    await auto_delete.delete_command([mes, message])
+                    return
+            else:
+                mes = await message.reply("Неверные аргументы")
+                await auto_delete.delete_command([mes, message])
+                return
     else:
         mes = await message.reply("Нет такого аргумента\n/help для показа всех команд")
         await auto_delete.delete_command([mes, message])
@@ -251,7 +275,7 @@ async def change_settings(app: Client, message: Message):
 
 @Client.on_message(filters.command('help'))
 async def help_message(app: Client, message: Message):
-    logger.info(f'user_id = {message.from_user.id} | first_name = {message.from_user.first_name} | last_name = {message.from_user.last_name} | used !help is private chat')
+    logger.info(f'user_id = {message.from_user.id} | first_name = {message.from_user.first_name} | last_name = {message.from_user.last_name} | used /help')
     text = ["<b>Все команды для администрации группы:</b>"]
     for command in settings_commands:
         command_args = settings_commands.get(command)
