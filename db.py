@@ -19,8 +19,8 @@ def prepare_db():
         night_mode_off TEXT,/*5 00*/
         night_mode_status INTEGER, /*1-вкл, 0-выкл*/
         report_chat INTEGER,/*если 0 то отправляется всем админам*/
-        auto_delete_commands INTEGER,/*время автоудаления команд в сек, 0 = не удалять*/
-        auto_delete_timetables INTEGER/*время автоудаления расписания в сек, 0 = не удалять*/
+        auto_delete_commands_time INTEGER,/*время автоудаления команд в сек, 0 = не удалять*/
+        auto_delete_timetables_time INTEGER/*время автоудаления расписания в сек, 0 = не удалять*/
         );/*Это просто были примеры*/
         CREATE TABLE IF NOT EXISTS warns(
         chat_id INTEGER,
