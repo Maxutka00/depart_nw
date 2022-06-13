@@ -23,7 +23,7 @@ async def message_deleter(message, time: int = 180):
 
 
 
-avtobus_nn = r"(^|\b)((автобус) +\d+[абг]?)|(\d+[абг]? +(автобус))(^|\b)"
+avtobus_nn = r"(^|\b)((автобус|маршрут) +\d+[абг]?)|(\d+[абг]? +(автобус|маршрут))(^|\b)"
 
 
 @Client.on_message(filters.regex(avtobus_nn, re.I))
@@ -58,7 +58,7 @@ async def incorrect_input(app: Client, message: Message):
     await auto_delete.delete_command(messages)
 
 
-@Client.on_message(filters.regex(r"(^|\b)(маршрут\w*) +\d+[АБГ]?(^|\b)", re.I))
+@Client.on_message(filters.regex(r"(^|\b)(маршрутк\w*) +\d+[АБГ]?(^|\b)", re.I))
 async def incorrect_input(app: Client, message: Message):
     mes = await message.reply("Забудьте про слово маршрутка, у Дніпрі всі маршрути автобусні.\n\nнапишіть:\nавтобус [номер автобуса]\n— автобус 151а\n— автобус 77\n— автобус 1")
     messages = [mes]

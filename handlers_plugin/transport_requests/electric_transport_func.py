@@ -2,23 +2,26 @@ import asyncio
 import os
 import re
 
-from pyrogram import filters, Client, enums
 from loguru import logger
+from pyrogram import filters, Client
 from pyrogram.enums import ParseMode
-from pyrogram.types import Message, CallbackQuery, InputMedia, InputMediaPhoto
+from pyrogram.types import Message, CallbackQuery, InputMediaPhoto
 
 import func.translit
 from func import auto_delete
 from keyboards.inline import electric_transport_kb
 
 
-async def message_deleter(message, time: int = 180):
+async def message_deleter(message, time: int = 30):
     await asyncio.sleep(time)
-    try:
-        await message.delete()
-    except Exception:
-        pass
+    print(transport_requests)
+    if message.id in transport_requests:
+        try:
+            await message.delete()
+        except Exception:
+            pass
 
+transport_requests = {}
 
 troll_nn = r"(^|\b)((тро(лл|л)ейбус +(\d+|А|Б))|(трамвай +\d+))|(((\d+|А|Б) +тро(лл|л)ейбус)|(\d+ +трамвай))(^|\b)"
 
@@ -52,14 +55,21 @@ async def tram_troll_request(app: Client, message: Message):
                                    reply_to_message_id=message.reply_to_message_id or message.id,
                                    parse_mode=ParseMode.HTML,
                                    reply_markup=kb)
-        messages = [mes]
         if message.text == match.group():
-            messages.append(message)
-        await auto_delete.delete_timetable(messages)
+            await auto_delete.delete_timetable([message])
+        transport_requests.update({mes.id: message.from_user.id})
+        await asyncio.create_task(message_deleter(mes))
 
 
 @Client.on_callback_query(filters.regex(r"(\d+|a|b)(trol|tram)", re.I))
 async def change_stop(app: Client, callback_query: CallbackQuery):
+    user = transport_requests.get(callback_query.message.id, None)
+    if user:
+        if user == callback_query.from_user.id:
+            transport_requests.pop(callback_query.message.id)
+        else:
+            await callback_query.answer("Це не для вас")
+            return
     del_kb = True
     text = callback_query.data.replace(callback_query.matches[0].group(), '')
     text = func.translit.translit(text, True).replace('"', "'").replace("\\", "bsl").replace("/", "sl")
@@ -67,4 +77,5 @@ async def change_stop(app: Client, callback_query: CallbackQuery):
     if del_kb:
         await callback_query.message.edit_reply_markup(None)
     await callback_query.message.edit_media(InputMediaPhoto(photo))
+    await auto_delete.delete_timetable([callback_query.message])
 
