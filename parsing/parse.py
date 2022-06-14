@@ -218,7 +218,7 @@ def electric_transport_parse():
                 #return
     except Exception as e:
         for tech_admin in config.tech_admins:
-            requests.post(f"https://api.telegram.org/bot{config.bot_token}/sendMessage?chat_id={tech_admin}&text=Ошибка при парсинге {link}\n\n{traceback.format_exc()}")
+            requests.post(f"https://api.telegram.org/bot{config.TOKEN}/sendMessage?chat_id={tech_admin}&text=Ошибка при парсинге {link}\n\n{traceback.format_exc()}")
         print(dir(e))
 
 
