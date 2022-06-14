@@ -79,7 +79,7 @@ def render(data: dict):
                     draw.text((139 + 545 * day + 53 * num, 257 + row_num * 41.39), minute, font=font, fill=text_color)
         direction = stop.split('_')[1].replace('"', "'").replace("/", "sl").replace(
             "\\", "bsl")
-        stop = stop.split('_')[0].replace('"', "'").replace("\\", "bsl").replace("/", "sl")
+        stop = stop.split('_')[0].replace('"', "'").replace("/", "_sl_")
         name = f"{stop}_{direction}"
         image.save(os.path.join("parsing", "photos", f"{data['num_way']}{data['transport']}_{name}.png"), "PNG")
         #image.show()
