@@ -77,9 +77,9 @@ def render(data: dict):
                     continue
                 for num, minute in enumerate(minutes):
                     draw.text((139 + 545 * day + 53 * num, 257 + row_num * 41.39), minute, font=font, fill=text_color)
-        direction = stop.split('_')[1].replace('"', "'").replace("/", "sl").replace(
+        direction = stop.split('_')[1].replace('"', "'").replace("/", ".sl.").replace(
             "\\", "bsl")
-        stop = stop.split('_')[0].replace('"', "'").replace("/", "_sl_")
+        stop = stop.split('_')[0].replace('"', "'").replace("/", ".sl.")
         name = f"{stop}_{direction}"
         image.save(os.path.join("parsing", "photos", f"{data['num_way']}{data['transport']}_{name}.png"), "PNG")
         #image.show()

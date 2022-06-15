@@ -72,8 +72,10 @@ async def change_stop(app: Client, callback_query: CallbackQuery):
             return
     del_kb = True
     text = callback_query.data.replace(callback_query.matches[0].group(), '')
-    text = func.translit.translit(text, True).replace('"', "'").replace("\\", "bsl").replace("/", "_sl_")
+    text = func.translit.translit(text, True).replace('"', "'").replace("\\", "bsl").replace("/", ".sl.")
     photo = os.path.join("parsing", "photos", callback_query.matches[0].group() + text + '.png')
+    print(photo)
+    print(os.path.exists(photo))
     if del_kb:
         await callback_query.message.edit_reply_markup(None)
     await callback_query.message.edit_media(InputMediaPhoto(photo))

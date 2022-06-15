@@ -12,7 +12,7 @@ def electric_transport_kb(transport: Literal["trol", "tram"], num: str) -> Optio
     files.sort(key=lambda x: os.path.getmtime(os.path.join("parsing", "photos", x)))
     kb = []
     for file in files:
-        file = file.replace(".png", "").replace("'", '"').replace("bsl", "\\").replace("_sl_", "/")
+        file = file.replace(".png", "").replace("'", '"').replace("bsl", "\\").replace(".sl.", "/")
         name = file.split('_')
         name = f"{name[1]} {('(до ' + name[2] + ')') if name[2] != '' else ''}"
         file = translit(file)
