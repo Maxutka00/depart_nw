@@ -31,7 +31,7 @@ async def report(app: Client, message: Message):
     for chat in chats:
         try:
             await app.send_message(chat,
-                                   f"Вызов администрации\nКоманду вызвал: {message.reply_to_message.from_user.mention}\n\nСсылка на сообщение:\n{message.link}")
+                                   f"Вызов администрации\nКоманду вызвал: {message.from_user.mention} на {message.reply_to_message.from_user.mention}\n\nСсылка на сообщение:\n{message.reply_to_message.link}")
         except Exception as e:
             print(e)
     mes = await message.reply("Ваше сообщение было доставлено администрации")
