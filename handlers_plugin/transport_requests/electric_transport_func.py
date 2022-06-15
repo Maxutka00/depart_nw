@@ -14,7 +14,6 @@ from keyboards.inline import electric_transport_kb
 
 async def message_deleter(message, time: int = 10):
     await asyncio.sleep(time)
-    print("done")
     if message.id in transport_requests:
         try:
             await message.delete()
