@@ -12,9 +12,9 @@ from func import auto_delete
 from keyboards.inline import electric_transport_kb
 
 
-async def message_deleter(message, time: int = 30):
+async def message_deleter(message, time: int = 10):
     await asyncio.sleep(time)
-    print(transport_requests)
+    print("done")
     if message.id in transport_requests:
         try:
             await message.delete()
@@ -55,10 +55,10 @@ async def tram_troll_request(app: Client, message: Message):
                                    reply_to_message_id=message.reply_to_message_id or message.id,
                                    parse_mode=ParseMode.HTML,
                                    reply_markup=kb)
+        transport_requests.update({mes.id: message.from_user.id})
         if message.text == match.group():
             await auto_delete.delete_timetable([message])
-        transport_requests.update({mes.id: message.from_user.id})
-        await asyncio.create_task(message_deleter(mes))
+        asyncio.create_task(message_deleter(mes))
 
 
 @Client.on_callback_query(filters.regex(r"(\d+|a|b)(trol|tram)", re.I))
@@ -74,8 +74,6 @@ async def change_stop(app: Client, callback_query: CallbackQuery):
     text = callback_query.data.replace(callback_query.matches[0].group(), '')
     text = func.translit.translit(text, True).replace('"', "'").replace("\\", "бслеш").replace("/", "слеш")
     photo = os.path.join("parsing", "photos", callback_query.matches[0].group() + text + '.png')
-    print(photo)
-    print(os.path.exists(photo))
     if del_kb:
         await callback_query.message.edit_reply_markup(None)
     await callback_query.message.edit_media(InputMediaPhoto(photo))

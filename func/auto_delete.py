@@ -25,7 +25,7 @@ async def delete_command(messages_: Union[Message, List[Message], Tuple[Message]
 
     if isinstance(messages_, Message):
         messages_ = [messages_]
-    await asyncio.create_task(delete_command_func(messages_))
+    asyncio.create_task(delete_command_func(messages_))
 
 
 async def delete_timetable(messages_: Union[Message, List[Message], Tuple[Message]], time: int = None):
@@ -44,4 +44,4 @@ async def delete_timetable(messages_: Union[Message, List[Message], Tuple[Messag
 
     if isinstance(messages_, Message):
         messages_ = [messages_]
-    await asyncio.create_task(delete_timetable_func(messages_))
+    asyncio.create_task(delete_timetable_func(messages_))
