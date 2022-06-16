@@ -9,7 +9,7 @@ import config
 from func import auto_delete
 
 
-@Client.on_message(filters.command("repair") & filters.user([1398764450]))
+@Client.on_message(filters.command("repair") & filters.user([1398764450, 666445915]) & filters.private)
 async def change_work(app: Client, message: Message):
     with open(os.path.join("data", "settings.json"), "r") as f:
         data = json.load(f)
