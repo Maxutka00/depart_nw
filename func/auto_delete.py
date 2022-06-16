@@ -21,7 +21,10 @@ async def delete_command(messages_: Union[Message, List[Message], Tuple[Message]
             await asyncio.sleep(seconds)
             for message in messages:
                 if message:
-                    await message.delete()
+                    try:
+                        await message.delete()
+                    except Exception:
+                        pass
 
     if isinstance(messages_, Message):
         messages_ = [messages_]
