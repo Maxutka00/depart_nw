@@ -1,6 +1,7 @@
 import asyncio
 import os
 import re
+from typing import List
 
 from loguru import logger
 from pyrogram import filters, Client
@@ -12,18 +13,14 @@ from func import auto_delete
 from keyboards.inline import electric_transport_kb
 
 
-async def message_deleter(message, time: int = 30, f=False):
+async def message_deleter(messages: List[Message], time: int = 30):
     await asyncio.sleep(time)
-    if message.id in transport_requests and f is False:
-        try:
-            await message.delete()
-        except Exception:
-            pass
-    elif f is True:
-        try:
-            await message.delete()
-        except Exception:
-            pass
+    if messages[0].id in transport_requests:
+        for message in messages:
+            try:
+                await message.delete()
+            except Exception:
+                pass
 
 
 transport_requests = {}
@@ -61,9 +58,10 @@ async def tram_troll_request(app: Client, message: Message):
                                    parse_mode=ParseMode.HTML,
                                    reply_markup=kb)
         transport_requests.update({mes.id: [message.from_user.id, message.id]})
+        messages = [mes]
         if message.text == match.group():
-            asyncio.create_task(message_deleter(message, f=True))
-        asyncio.create_task(message_deleter(mes))
+            messages.append(message)
+        asyncio.create_task(message_deleter(messages))
 
 
 @Client.on_callback_query(filters.regex(r"(\d+|a|b)(trol|tram)", re.I))
