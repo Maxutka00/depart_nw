@@ -40,8 +40,10 @@ async def delete_timetable(messages_: Union[Message, List[Message], Tuple[Messag
             await asyncio.sleep(seconds)
             for message in messages:
                 if message:
-                    await message.delete()
-
+                    try:
+                        await message.delete()
+                    except Exception:
+                        pass
     if isinstance(messages_, Message):
         messages_ = [messages_]
     asyncio.create_task(delete_timetable_func(messages_))

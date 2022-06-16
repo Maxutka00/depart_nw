@@ -19,6 +19,8 @@ async def text_mat(app, message):
         await app.delete_messages(message.chat.id, message.id)
     except Exception as e:
         print(e)
+    if not message.from_user:
+        return
     num_warn = db.add_warn(message.chat.id, message.reply_to_message.from_user.id, "использовано запрещённое слово")
     if num_warn == 1:
         hours = 3

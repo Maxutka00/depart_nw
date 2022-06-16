@@ -114,7 +114,9 @@ async def change_settings(app: Client, message: Message):
                 night_mode_scheduler.reschedule_job(f'{message.chat.id}_{args[1]}', trigger='cron',
                                                     hour=time.split()[0], minute=time.split()[1])
             except JobLookupError:
-                print("e")
+                mes = await message.reply("Время изменено, но у вас не включен ночной режим")
+                await auto_delete.delete_command([mes, message])
+                return
             mes = await message.reply("Время изменено")
             await auto_delete.delete_command([mes, message])
             return
@@ -134,7 +136,7 @@ async def change_settings(app: Client, message: Message):
                 night_mode_scheduler.remove_job(f"{message.chat.id}_on")
                 night_mode_scheduler.remove_job(f"{message.chat.id}_off")
             except Exception as e:
-                print(e)
+                pass
             with open(os.path.join("data", "night_messages.json"), "r") as f:
                 message_ids = json.load(f)
             message_ids.pop(message.chat.id, None)

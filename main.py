@@ -24,6 +24,7 @@ if not os.path.exists(os.path.join("parsing", "photos")):
 plugins = dict(
     root="handlers_plugin",
     include=[
+        "moderate.white_channel",
         "moderate.change_work",
         "moderate.all_usr",
         "commands.start",
@@ -37,7 +38,6 @@ plugins = dict(
         "join_left_chat_member.new_chat_members",
         "moderate.delete_sticker_voice_audio_animation_game_location",
         "moderate.forbidden_word",
-        "moderate.white_channel",
         "moderate.white_link",
         "moderate.change_group_settings",
         "moderate.parse_by_command",

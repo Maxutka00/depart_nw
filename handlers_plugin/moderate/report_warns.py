@@ -42,6 +42,8 @@ async def report(app: Client, message: Message):
 @Client.on_message(filters.command(["warn", "w"], prefixes=["/",
                                                             "!"]) & filters.group & filters.reply & costum_filters.chat_admin_filter)
 async def warn(app: Client, message: Message):
+    if message.sender_chat:
+        return await message.reply("Невозможно выдать варн, человек пишет не от своего имени")
     mes1 = None
     if len(message.command) < 2:
         mes = await message.reply("Вы не указали аргументы")

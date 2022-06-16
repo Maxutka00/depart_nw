@@ -139,9 +139,17 @@ def get_chat_admins(chat_id: int, int_list: bool = True, ) -> Union[List[str], L
             add_chat(chat_id, [])
             return []
         admins = admins[0]
+        admins = admins.split()
+        a = False
+        for admin in admins:
+            if not admin.isdigit():
+                a = True
+                admins.pop(admins.index(admin))
+        if a:
+            cursor.execute("UPDATE chats SET admins = ? WHERE id = ?", (' '.join(admins), chat_id))
         if int_list:
-            return list(map(int, admins.split()))
-        return admins.split()
+            return list(map(int, admins))
+        return admins
 
 
 def del_admin(chat_id: int, admin_id, ):

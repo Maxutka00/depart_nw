@@ -1,5 +1,5 @@
 import db
-import string
+
 
 def firs_letter(string: str):
     string = list(string)
@@ -13,6 +13,8 @@ def get_text(num: str, transport_type):
     all_data = db.get_transport(num)
     text = []
     if not all_data:
+        if not num:
+            return
         for symbol in num:
             if not symbol.isdigit():
                 num = num.replace(symbol, '')
@@ -39,7 +41,7 @@ def get_text(num: str, transport_type):
             text.append(f"<b>{way_place[i]}</b> - {way_time[i]}")
             if data[5]:
                 text.append(firs_letter(data[5].split('\n')[i]))
-            if i != len(way_place)-1 and len(way_time[i]) >= 75:
+            if i != len(way_place) - 1 and len(way_time[i]) >= 75:
                 text.append('')
         if data[4]:
             text.append('\n<b>Інтервал руху:</b>')
@@ -48,9 +50,10 @@ def get_text(num: str, transport_type):
             for i in range(len(intervals)):
                 interval = 'не известно' if intervals[i] == '' else intervals[0]
                 text.append(f"{interval_time[i]} - {interval}хв")
-        if data[4] and all_data.index(data) != len(all_data)-1:
+        if data[4] and all_data.index(data) != len(all_data) - 1:
             text.append("———————————")
-    text.append("\nМожливі відхилення від інтервалів руху у зв'язку з браком палива.\nПо роботі бота писати @VAEZAN453534")
+    text.append(
+        "\nМожливі відхилення від інтервалів руху у зв'язку з браком палива.\nПо роботі бота писати t.me/ins_bot_chat")
     return '\n'.join(text)
 
 

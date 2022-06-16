@@ -12,7 +12,7 @@ from func import auto_delete
 from keyboards.inline import electric_transport_kb
 
 
-async def message_deleter(message, time: int = 10):
+async def message_deleter(message, time: int = 30):
     await asyncio.sleep(time)
     if message.id in transport_requests:
         try:
@@ -54,9 +54,9 @@ async def tram_troll_request(app: Client, message: Message):
                                    reply_to_message_id=message.reply_to_message_id or message.id,
                                    parse_mode=ParseMode.HTML,
                                    reply_markup=kb)
-        transport_requests.update({mes.id: message.from_user.id})
+        transport_requests.update({mes.id: [message.from_user.id, message.id]})
         if message.text == match.group():
-            await auto_delete.delete_timetable([message])
+            asyncio.create_task(message_deleter(message))
         asyncio.create_task(message_deleter(mes))
 
 
@@ -64,7 +64,7 @@ async def tram_troll_request(app: Client, message: Message):
 async def change_stop(app: Client, callback_query: CallbackQuery):
     user = transport_requests.get(callback_query.message.id, None)
     if user:
-        if user == callback_query.from_user.id:
+        if user[0] == callback_query.from_user.id:
             transport_requests.pop(callback_query.message.id)
         else:
             await callback_query.answer("Це не для вас")
@@ -76,5 +76,5 @@ async def change_stop(app: Client, callback_query: CallbackQuery):
     if del_kb:
         await callback_query.message.edit_reply_markup(None)
     await callback_query.message.edit_media(InputMediaPhoto(photo))
-    await auto_delete.delete_timetable([callback_query.message])
+    await auto_delete.delete_timetable([callback_query.message, user[1] if user else callback_query.message.reply_to_message])
 

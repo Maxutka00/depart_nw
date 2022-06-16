@@ -15,6 +15,8 @@ async def white_list_link(app, message):
         await message.delete()
     except Exception as e:
         print(e)
+    if not message.from_user:
+        return
     num_warn = db.add_warn(message.chat.id, message.reply_to_message.from_user.id, "отправлена ссылка")
     if num_warn == 1:
         hours = 3
