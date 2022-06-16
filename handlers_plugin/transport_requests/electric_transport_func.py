@@ -12,13 +12,19 @@ from func import auto_delete
 from keyboards.inline import electric_transport_kb
 
 
-async def message_deleter(message, time: int = 30):
+async def message_deleter(message, time: int = 30, f=False):
     await asyncio.sleep(time)
-    if message.id in transport_requests:
+    if message.id in transport_requests and f is False:
         try:
             await message.delete()
         except Exception:
             pass
+    elif f is True:
+        try:
+            await message.delete()
+        except Exception:
+            pass
+
 
 transport_requests = {}
 
@@ -56,7 +62,7 @@ async def tram_troll_request(app: Client, message: Message):
                                    reply_markup=kb)
         transport_requests.update({mes.id: [message.from_user.id, message.id]})
         if message.text == match.group():
-            asyncio.create_task(message_deleter(message))
+            asyncio.create_task(message_deleter(message, f=True))
         asyncio.create_task(message_deleter(mes))
 
 
@@ -76,5 +82,5 @@ async def change_stop(app: Client, callback_query: CallbackQuery):
     if del_kb:
         await callback_query.message.edit_reply_markup(None)
     await callback_query.message.edit_media(InputMediaPhoto(photo))
-    await auto_delete.delete_timetable([callback_query.message, user[1] if user else callback_query.message.reply_to_message])
-
+    await auto_delete.delete_timetable(
+        [callback_query.message, user[1] if user else callback_query.message.reply_to_message])
