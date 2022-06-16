@@ -19,7 +19,7 @@ async def change_work(app: Client, message: Message):
     await message.reply(
         f"Успешно изменён режим: {'бот работает нормально' if data['work'] else 'бот на тех обслуживании'}")
     try:
-        if data["work"] is True:
+        if data["work"] is False:
             await app.send_message(config.chat_dp_id,
                                "Просимо вибачення бот тимчасово відключено\n\nЗ однієї або кількох причин:\n— Вийшла з ладу одна з функцій\n- профілактичні виправлення текстів\n- Зміна даних та конфігурації або коду.")
     except Exception as e:
