@@ -5,10 +5,12 @@ from pyrogram.types import Message
 import threading
 import config
 from parsing import parse
+from func import logger
 
 
 @Client.on_message(filters.command("parse") & filters.user(config.default_admins))
 async def start_parse(app: Client, message: Message):
+    logger.loggers(message, text="used !parse")
     await message.delete()
     try:
         parse.transport_parse()

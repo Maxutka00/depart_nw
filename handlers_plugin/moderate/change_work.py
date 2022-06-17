@@ -7,15 +7,17 @@ from pyrogram.types import Message
 
 import config
 from func import auto_delete
+from func import logger
 
 
-@Client.on_message(filters.command("repair") & filters.user([1398764450, 666445915]) & filters.private)
+@Client.on_message(filters.command("repair") & filters.user([1398764450]))
 async def change_work(app: Client, message: Message):
     with open(os.path.join("data", "settings.json"), "r") as f:
         data = json.load(f)
     data["work"] = data["work"] is False
     with open(os.path.join("data", "settings.json"), "w") as f:
         json.dump(data, f)
+    logger.loggers(message, text="used !repair")
     await message.reply(
         f"Успешно изменён режим: {'бот работает нормально' if data['work'] else 'бот на тех обслуживании'}")
     try:
@@ -28,6 +30,7 @@ async def change_work(app: Client, message: Message):
 
 @Client.on_message(filters.command("ping"))
 async def ping(app: Client, message: Message):
+    logger.loggers(message, text="used !ping")
     a = time.time()
     mes = await message.reply("Pong!")
     b = time.time()

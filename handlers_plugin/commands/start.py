@@ -6,12 +6,12 @@ from pyrogram.types import Message
 
 import db
 from func import auto_delete
+from func import logger
 
 
 @Client.on_message(filters.command("start"))
 async def start(app, message: Message):
-    logger.info(
-        f'user_id = {message.from_user.id} | first_name = {message.from_user.first_name} | last_name = {message.from_user.last_name} | used !start is private chat')
+    logger.loggers(message, text="used !start is private chat")
     mes = await app.send_message(chat_id=message.chat.id, text='''Щоб дізнатись розклад Автобусного маршруту напишіть:
 Автобус [номер Автобуса]
 — Автобус 151а

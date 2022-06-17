@@ -6,12 +6,13 @@ from pyrogram.types import Message
 import config
 from costum_filters import chat_admin_filter
 from func import auto_delete
+from func import logger
 
 
 @Client.on_message(filters.command("del", prefixes=config.prefix) & chat_admin_filter)
 async def dels(app: Client, message: Message):
-    logger.info(
-        f'user_id = {message.from_user.id} | first_name = {message.from_user.first_name} | last_name = {message.from_user.last_name} | used !del')
+    logger.loggers(message, text="used !del")
+    #logger.info(f'chat_id = {message.chat.id} | user_id = {message.from_user.id} | first_name = {message.from_user.first_name} | last_name = {message.from_user.last_name} | used !del')
     if message.reply_to_message:
         await app.delete_messages(message.chat.id, [message.reply_to_message_id, message.id])
     else:

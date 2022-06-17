@@ -12,6 +12,7 @@ import config
 import costum_filters
 import db
 from func import auto_delete
+from func import logger
 from schedulers import on_night_mode, night_mode_scheduler, off_night_mode
 
 settings_commands = {
@@ -27,13 +28,16 @@ settings_commands = {
 @Client.on_message(
     filters.command('settings', prefixes=config.prefix) & filters.group & costum_filters.chat_admin_filter )
 async def change_settings(app: Client, message: Message):
+    
     db.add_chat(message.chat.id, [(i.user.id if i.status == ChatMemberStatus.OWNER else ...) async for i in
                                   app.get_chat_members(message.chat.id, filter=ChatMembersFilter.ADMINISTRATORS)])
     if len(message.command) < 2:
+        logger.loggers(message, text="used !settings incorrectly")
         mes = await message.reply("Вы не указали аргументы\n/help для показа всех команд")
         await auto_delete.delete_command([mes, message])
         return
     if message.command[1] not in list(settings_commands):
+        logger.loggers(message, text="used !settings command missing")
         mes = await message.reply("Такой настройки нет\n/help для показа всех команд")
         await auto_delete.delete_command([mes, message])
         return
@@ -55,6 +59,7 @@ async def change_settings(app: Client, message: Message):
                     db.add_admin(message.chat.id, admin)
                 except Exception as e:
                     print(e)
+            logger.loggers(message, text="Admins added successfully")
             await message.reply("Админы успешно добавлены")
             return
         elif args[1] == 'del':
@@ -70,6 +75,7 @@ async def change_settings(app: Client, message: Message):
                 if admin == message.from_user.id:
                     continue
                 db.del_admin(message.chat.id, admin)
+            logger.loggers(message, text="Admins successfully deleted")
             await message.reply("Админы успешно удалены")
             return
         elif args[1] == 'get':

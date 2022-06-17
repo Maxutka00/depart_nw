@@ -10,11 +10,12 @@ def firs_letter(string: str):
 
 
 def get_text(num: str, transport_type):
-    all_data = db.get_transport(num)
+    all_data = db.get_transport(num.lower())
     text = []
     if not all_data:
         if not num:
-            return
+            txt = "Помилка! Напишіть у t.me/ins_bot_chat"
+            return f"{transport_type} {num}\n\n{txt}"
         for symbol in num:
             if not symbol.isdigit():
                 num = num.replace(symbol, '')
@@ -23,7 +24,7 @@ def get_text(num: str, transport_type):
         elif int(num) > 177:
             txt = 'Даний маршрут не входить у маршрутну сітку міста Дніпро і, на жаль, ми не змогли отримати інформацію щодо його розкладу. Щоб дізнатись його розклад спробуйте зателефонувати на гарячу лінію ОДА за безкоштовним номером - 0800505600'
         else:
-            return
+            txt = "Помилка! Напишіть у t.me/ins_bot_chat"
         return f"{transport_type} {num}\n\n{txt}"
     text.append(f"<b>{transport_type} {num}</b>")
     for data in all_data:
@@ -53,7 +54,7 @@ def get_text(num: str, transport_type):
         if data[4] and all_data.index(data) != len(all_data) - 1:
             text.append("———————————")
     text.append(
-        "\nМожливі відхилення від інтервалів руху у зв'язку з браком палива.\nПо роботі бота писати t.me/ins_bot_chat")
+        "\nМожливі відхилення від інтервалів руху у зв'язку з браком палива.")
     return '\n'.join(text)
 
 

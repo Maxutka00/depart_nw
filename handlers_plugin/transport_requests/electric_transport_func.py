@@ -11,7 +11,7 @@ from pyrogram.types import Message, CallbackQuery, InputMediaPhoto
 import func.translit
 from func import auto_delete
 from keyboards.inline import electric_transport_kb
-
+from func import logger
 
 async def message_deleter(messages: List[Message], time: int = 30):
     await asyncio.sleep(time)
@@ -31,8 +31,7 @@ troll_nn = r"(^|\b)((тро(лл|л)ейбус +(\d+|А|Б))|(трамвай +\d
 @Client.on_message(filters.regex(troll_nn, re.I))
 async def tram_troll_request(app: Client, message: Message):
     for match in message.matches:
-        logger.info(
-            f'user_id = {message.from_user.id} | first_name = {message.from_user.first_name} | last_name = {message.from_user.last_name} | number_route = {match.group()}')
+        logger.loggers(message, text=f"Электротранспорт = {match.group()}")
         num = None
         names = {"троллейбус": "trol", "тролейбус": "trol", "трамвай": "tram"}
         letters = {"б": "b", "а": "a"}
