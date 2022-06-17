@@ -1,4 +1,5 @@
 import os
+from types import TracebackType
 
 from pyrogram import Client
 from loguru import logger
@@ -7,10 +8,20 @@ import db
 from parsing.parse import transport_parse, electric_transport_parse
 from schedulers import on_night_mode, off_night_mode, night_mode_scheduler, bus_parse_scheduler, \
     electric_transport_scheduler
+import traceback
+import sys
 
-logger.add("logs/logger.log", rotation="15 MB", backtrace=True, diagnose=True)
-logger.info('------------------------------')
-logger.info('Starting a telegram bot')
+logger.add("logs/logger.log", rotation="15 MB", level=5, backtrace=True, diagnose=True, enqueue=True)
+
+
+def log_uncaught_exceptions(ex_cls, ex, tb: TracebackType):
+    text = '{}: {}:\n'.format(ex_cls.__name__, ex)
+    text += ''.join(traceback.format_tb(tb))
+
+    logger.trace(text)
+
+
+sys.excepthook = log_uncaught_exceptions
 
 if not os.path.exists(os.path.join("data", "night_messages.json")):
     with open(os.path.join("data", "night_messages.json"), "w") as f:
@@ -68,11 +79,13 @@ for chat in db.get_all_chats():
                                  hour=chat[5].split()[0], minute=chat[5].split()[1])
     night_mode_scheduler.add_job(off_night_mode, "cron", args=(chat[0], app), id=f"{chat[0]}_stop",
                                  hour=chat[6].split()[0], minute=chat[6].split()[1])
-
+logger.info('------------------------------')
+logger.info('Prepearing a telegram bot')
 night_mode_scheduler.start()
 bus_parse_scheduler.add_job(transport_parse, "interval", hours=2)
 bus_parse_scheduler.start()
 electric_transport_scheduler.add_job(electric_transport_parse, "cron", hour=3, minute=0)
 electric_transport_scheduler.start()
 db.add_transport(transport_parse())
+logger.info('Starting a telegram bot')
 app.run()
