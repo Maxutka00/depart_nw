@@ -36,7 +36,7 @@ async def on_night_mode(chat_id: int, app: Client):
 Пример: <code>автобус 151а</code>
 Пример: <code>тролейбус 4</code>
 Пример: <code>трамвай 1</code>
-функція працює і в особистому чаті з ботом""")
+функція працює і в особистому чаті з ботом""", disable_web_page_preview=True)
         with open(os.path.join("data", "night_messages.json"), "r") as f:
             message_ids = json.load(f)
         message_ids.update({str(chat_id): message.id})

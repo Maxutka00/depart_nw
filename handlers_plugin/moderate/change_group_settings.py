@@ -2,7 +2,6 @@ import json
 import os
 import re
 
-from loguru import logger
 from apscheduler.jobstores.base import JobLookupError
 from pyrogram import Client, filters
 from pyrogram.enums import ChatMemberStatus, ChatMembersFilter
@@ -13,6 +12,7 @@ import costum_filters
 import db
 from func import auto_delete
 from func import logger
+from keyboards import inline
 from schedulers import on_night_mode, night_mode_scheduler, off_night_mode
 
 settings_commands = {
@@ -287,13 +287,14 @@ async def change_settings(app: Client, message: Message):
 
 @Client.on_message(filters.command('help'))
 async def help_message(app: Client, message: Message):
-    logger.info(f'user_id = {message.from_user.id} | first_name = {message.from_user.first_name} | last_name = {message.from_user.last_name} | used /help')
     text = ["<b>Все команды для администрации группы:</b>"]
     for command in settings_commands:
         command_args = settings_commands.get(command)
         for i in command_args:
             text.append(f"<code>{config.prefix}settings {command} {i}</code>")
     text.append("\nУзнать значение любой настройки можно с помощью get\nПример: !settings [настройка] get")
-    mes = await message.reply('\n'.join(text))
+    if inline.donate_kb():
+        text.append("\nПоддержать проект вы можете по кнопке ниже")
+    mes = await message.reply('\n'.join(text), reply_markup=inline.donate_kb())
     await auto_delete.delete_command([mes, message])
     return

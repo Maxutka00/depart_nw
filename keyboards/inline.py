@@ -2,6 +2,7 @@ from typing import Literal, Optional
 import os
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+import config
 from func.translit import translit
 
 
@@ -23,4 +24,11 @@ def electric_transport_kb(transport: Literal["trol", "tram"], num: str) -> Optio
 
 def del_mute_kb(user_id: int) -> InlineKeyboardMarkup:
     kb = [[InlineKeyboardButton("Снять мут", callback_data=f"unmute_{user_id}")]]
+    return InlineKeyboardMarkup(kb)
+
+
+def donate_kb() -> Optional[InlineKeyboardMarkup]:
+    if config.donate_link == "":
+        return None
+    kb = [[InlineKeyboardButton("Пожервовать", url=config.donate_link)]]
     return InlineKeyboardMarkup(kb)
