@@ -1,28 +1,17 @@
 import os
-from types import TracebackType
 
 from pyrogram import Client
 from loguru import logger
 import config
 import db
+from func.except_hook import log_uncaught_exceptions
 from parsing.parse import transport_parse, electric_transport_parse
 from schedulers import on_night_mode, off_night_mode, night_mode_scheduler, bus_parse_scheduler, \
     electric_transport_scheduler
-import traceback
 import sys
-
 logger.add("logs/logger.log", rotation="15 MB", level=5, backtrace=True, diagnose=True, enqueue=True)
 
-
-def log_uncaught_exceptions(ex_cls, ex, tb: TracebackType):
-    text = '{}: {}:\n'.format(ex_cls.__name__, ex)
-    text += ''.join(traceback.format_tb(tb))
-
-    logger.trace(text)
-
-
-sys.excepthook = log_uncaught_exceptions
-
+#sys.excepthook = log_uncaught_exceptions
 if not os.path.exists(os.path.join("data", "night_messages.json")):
     with open(os.path.join("data", "night_messages.json"), "w") as f:
         f.write("{}")

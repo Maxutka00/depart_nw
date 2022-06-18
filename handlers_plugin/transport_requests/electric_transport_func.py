@@ -13,6 +13,7 @@ from func import auto_delete
 from keyboards.inline import electric_transport_kb
 from func import logger
 
+
 async def message_deleter(messages: List[Message], time: int = 30):
     await asyncio.sleep(time)
     if messages[0].id in transport_requests:
@@ -56,7 +57,7 @@ async def tram_troll_request(app: Client, message: Message):
                                    reply_to_message_id=message.reply_to_message_id or message.id,
                                    parse_mode=ParseMode.HTML,
                                    reply_markup=kb)
-        transport_requests.update({mes.id: [message.from_user.id, message.id]})
+        transport_requests.update({mes.id: [message.from_user.id, message]})
         messages = [mes]
         if message.text == match.group():
             messages.append(message)
