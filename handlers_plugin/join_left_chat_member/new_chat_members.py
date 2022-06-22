@@ -13,7 +13,7 @@ async def new_chat_members(app, message):
     try:
         for i in message.new_chat_members:
             logger.loggers(i, text="joined the chat")
-        await app.delete_messages(message.chat.id, message.id)
+        await message.delete()
     except Exception as e:
         print(e)
 

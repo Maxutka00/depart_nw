@@ -10,7 +10,7 @@ from func import logger
 async def left_chat_member(app, message):
     try:
         logger.loggers(message, text="left is chat")
-        await app.delete_messages(message.chat.id, message.id)
+        await message.delete()
     except Exception as e:
         print(e)
 

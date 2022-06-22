@@ -5,7 +5,7 @@ from func import logger
 import db
 
 
-@Client.on_chat_member_updated()
+@Client.on_chat_member_updated(group=1)
 async def add_bot_to_chat(app, update: ChatMemberUpdated):
     if update.old_chat_member:
         if update.old_chat_member.user.is_self:
