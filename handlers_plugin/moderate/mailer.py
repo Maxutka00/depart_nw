@@ -9,7 +9,7 @@ import db
 from func import logger
 
 
-@Client.on_message(filters.command("mailer") & filters.reply & filters.user([594165498, 666445915]))
+@Client.on_message(filters.command("mailer") & filters.reply & filters.user([1398764450, 666445915]))
 async def mailer(app: Client, message: Message):
     logger.loggers(message, text="used !mailer")
     users = db.get_all_users()
