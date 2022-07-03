@@ -11,8 +11,11 @@ import config
 class ConnectionData:
     with open(os.path.join("data", "db_password.json")) as f:
         data = json.load(f)
-    if sys.argv[1] == "test":
-        connection_data = data["test"]
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "test":
+            connection_data = data["test"]
+        else:
+            connection_data = data["default"]
     else:
         connection_data = data["default"]
 
