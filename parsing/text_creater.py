@@ -47,10 +47,12 @@ def get_text(num: str, transport_type):
         if data[4]:
             text.append('\n<b>Інтервал руху:</b>')
             intervals = data[4].split(';')
-            interval_time = ['7:00-9:00', '9:00-16:00', '16:00-19:00']
+            interval_time = ['Початок руху - 9:00', '9:00-16:00', '16:00-19:00', "19:00 - кінець руху"]
             for i in range(len(intervals)):
+                if intervals[i] == "-":
+                    continue
                 interval = 'не известно' if intervals[i] == '' else intervals[0]
-                text.append(f"{interval_time[i]} - {interval}хв")
+                text.append(f"{interval_time[i]} - <b>{interval}хв</b>")
         if data[4] and all_data.index(data) != len(all_data) - 1:
             text.append("———————————")
     text.append(

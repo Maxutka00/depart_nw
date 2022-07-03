@@ -14,6 +14,8 @@ from oauth2client.service_account import ServiceAccountCredentials
 from pyrogram import Client
 
 import config
+import db
+from func import global_vars
 from parsing import create_image
 
 first_bas_row = 10
@@ -49,7 +51,6 @@ def transport_parse():
     resp = sheet.values().batchGet(spreadsheetId=sheet_id, ranges=["Автобусні маршрути"])
     data = resp.execute()
     all_buses = data['valueRanges'][0]['values'][first_bas_row - 1:]
-
     all_buses = bus_parse(all_buses)
     return all_buses
 
@@ -96,7 +97,7 @@ def bus_parse(buses):
             if len(way_data) == 5:
                 interval_data = way_data[4]
             else:
-                intervals = ';'.join(way_data[-3:])
+                intervals = ';'.join(way_data[-4:])
         add_data += [way_place, way_time, time_data, intervals, interval_data, 1]
         data_bus.append(add_data)
 
@@ -107,19 +108,19 @@ electric_transport = {"tram": ["1", "4", "5", "6", "7", "9", "11", "12", "14", "
                       "trol": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "14", "15", "16", "17",
                                "19", "20", "21", "a", "b"]}
 
-
 time_transport = ["5:00", " 6:00", " 7:00", " 8:00", " 9:00", " 10:00", "11:00", "12:00", "13:00", "14:00", "15:00",
                   "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "00:00"]
 
 
 def electric_transport_parse():
+    link = None
+    global_vars.status.set_parsing_status(True)
     try:
-        link = None
         for transport in electric_transport:
             for num_way in electric_transport.get(transport):
                 data = {}
-                link = f"https://det-dnipro.dp.ua/{num_way}-{transport+'vaj' if transport == 'tram' else transport}"
-                #link = "https://det-dnipro.dp.ua/14-tramvaj/"
+                link = f"https://det-dnipro.dp.ua/{num_way}-{transport + 'vaj' if transport == 'tram' else transport}"
+                # link = "https://det-dnipro.dp.ua/14-tramvaj/"
                 print(f"Request to {link}")
                 q = time.time()
                 r = requests.get(link)
@@ -136,16 +137,21 @@ def electric_transport_parse():
                     soup = BeautifulSoup(table_r.text, "lxml")
                     css = soup.find("style", type="text/css").text
                     css = cssutils.parseString(css)
-                    inactive = []
+                    active = []
                     stop_classes = []
                     for i in css.cssRules:
                         if i.style.color == '#999':
-                            inactive.append(i.selectorText.replace('.', '').split()[-1])
+                            active.append(i.selectorText.replace('.', '').split()[-1])
                             continue
-                        elif (i.style.textAlign == 'center' and i.style.fontFamily.replace(' ', '') == '"docs-Calibri",Arial' and
+                        if (i.style.textAlign == 'center' and i.style.fontFamily.replace(' ',
+                                                                                         '') == '"docs-Calibri",Arial' and
                                 i.style.fontWeight == "bold"):
-                            if i.style.fontSize.replace("pt", "").isdigit() and int(i.style.fontSize.replace("pt", "")) >= 5:
+                            if i.style.fontSize.replace("pt", "").isdigit() and int(
+                                    i.style.fontSize.replace("pt", "")) >= 5:
                                 stop_classes.append(i.selectorText.replace('.', '').split()[-1])
+                        elif i.style.color == '#000':
+                            active.append(i.selectorText.replace('.', '').split()[-1])
+                            continue
                     table = soup.find("table", class_="waffle")
                     table_body = table.find('tbody')
                     rows = table_body.find_all('tr')
@@ -201,29 +207,38 @@ def electric_transport_parse():
                                 minute = col.find('div').text
                             if class_ in ('s0', 's10', 's9') and col.text == '':
                                 continue
-                            elif class_ in inactive or col.text == '':
+                            elif class_ not in active or col.text == '':
                                 minute = None
                             minutes = data['data'][day]['stops'][f"{stop}_{direction}"].get('time', {})
                             data['data'][day]['stops'][f"{stop}_{direction}"]['time'] = minutes
-                            minutes = data['data'][day]['stops'][f"{stop}_{direction}"]['time'].get(time_transport[element_index], [])
+                            minutes = data['data'][day]['stops'][f"{stop}_{direction}"]['time'].get(
+                                time_transport[element_index], [])
                             if minute is not None:
                                 minutes.append(minute)
-                            data['data'][day]['stops'][f"{stop}_{direction}"]['time'][time_transport[element_index]] = minutes
+                            data['data'][day]['stops'][f"{stop}_{direction}"]['time'][
+                                time_transport[element_index]] = minutes
                             # pprint(data)
                             element_index += 1
                 w = time.time()
                 create_image.render(data)
                 print(r, w - q, 'сек')
                 print()
-                #return
+                # return
     except Exception as e:
-        for tech_admin in config.tech_admins:
-            requests.post(f"https://api.telegram.org/bot{config.TOKEN}/sendMessage?chat_id={tech_admin}&text=Ошибка при парсинге {link}\n\n{traceback.format_exc()}")
+        for tech_admin in config.admins:
+            requests.post(
+                f"https://api.telegram.org/bot{config.TOKEN}/sendMessage?chat_id={tech_admin}&text=Ошибка при парсинге {link}\n\n{traceback.format_exc()}")
         print(dir(e))
+    finally:
+        global_vars.status.set_parsing_status(False)
+
+
+def bus_parse_func():
+    db.add_transport(transport_parse())
 
 
 if __name__ == '__main__':
     a = time.time()
-    electric_transport_parse()
+    transport_parse()
     b = time.time()
     print(b - a)

@@ -26,7 +26,7 @@ settings_commands = {
 
 
 @Client.on_message(
-    filters.command('settings', prefixes=config.prefix) & filters.group & costum_filters.chat_admin_filter )
+    filters.command('settings', prefixes=config.prefix) & filters.group & costum_filters.chat_admin_filter & costum_filters.admin_command)
 async def change_settings(app: Client, message: Message):
     
     db.add_chat(message.chat.id, [(i.user.id if i.status == ChatMemberStatus.OWNER else ...) async for i in
@@ -46,7 +46,7 @@ async def change_settings(app: Client, message: Message):
     args = message.text.split(maxsplit=3)[1:]
     if command == 'admins' and len(message.text.split(maxsplit=2)) >= 3:
         if args[1] == 'add':
-            admins = re.split(" |;", args[2])
+            admins = args[2].replace(" ", "").split(";")
             admin_list = []
             for i in admins:
                 try:
@@ -63,7 +63,7 @@ async def change_settings(app: Client, message: Message):
             await message.reply("Админы успешно добавлены")
             return
         elif args[1] == 'del':
-            admins = re.split(" |;", args[2])
+            admins = args[2].replace(" ", "").split(";")
             admin_list = []
             for i in admins:
                 try:
@@ -96,7 +96,8 @@ async def change_settings(app: Client, message: Message):
             await auto_delete.delete_command([mes, message])
             return
         else:
-            mes = await message.reply("Нет такого аргумента\n/help для показа всех команд")
+            mes = await message.reply(
+                f"Неверные аргументы\n<code>!settings {command} {' '.join(settings_commands.get(command))}</code>")
             await auto_delete.delete_command([mes, message])
             return
     elif command == 'night_mode' and len(message.text.split(maxsplit=2)) >= 3:
@@ -156,7 +157,8 @@ async def change_settings(app: Client, message: Message):
             await auto_delete.delete_command([mes, message])
             return
         else:
-            mes = await message.reply("Нет такого аргумента\n/help для показа всех команд")
+            mes = await message.reply(
+                f"Неверные аргументы\n<code>!settings {command} {' '.join(settings_commands.get(command))}</code>")
             await auto_delete.delete_command([mes, message])
             return
     elif command == 'links_whitelist' and len(message.text.split(maxsplit=2)) >= 3:
@@ -197,7 +199,8 @@ async def change_settings(app: Client, message: Message):
             await auto_delete.delete_command([mes, message])
             return
         else:
-            mes = await message.reply("Нет такого аргумента\n/help для показа всех команд")
+            mes = await message.reply(
+                f"Неверные аргументы\n<code>!settings {command} {' '.join(settings_commands.get(command))}</code>")
             await auto_delete.delete_command([mes, message])
             return
     elif command == 'blacklist' and len(message.text.split(maxsplit=2)) >= 3:
@@ -227,7 +230,9 @@ async def change_settings(app: Client, message: Message):
             await auto_delete.delete_command([mes, message])
             return
         else:
-            await message.reply("Нет такого аргумента\n/help для показа всех команд")
+            mes = await message.reply(f"Неверные аргументы\n<code>!settings {command} {' '.join(settings_commands.get(command))}</code>")
+            await auto_delete.delete_command([mes, message])
+            return
     elif command == "report" and len(message.text.split(maxsplit=2)) >= 3:
         if args[1] == 'get':
             chat = db.get_report_chat(message.chat.id)
@@ -273,16 +278,19 @@ async def change_settings(app: Client, message: Message):
                     await auto_delete.delete_command([mes, message])
                     return
                 else:
-                    mes = await message.reply("Нет такого аргумента\n/help для показа всех команд")
+                    mes = await message.reply(
+                        f"Неверные аргументы\n<code>!settings {command} {' '.join(settings_commands.get(command))}</code>")
                     await auto_delete.delete_command([mes, message])
                     return
             else:
-                mes = await message.reply("Неверные аргументы")
+                mes = await message.reply(f"Неверные аргументы\n<code>!settings {command} {' '.join(settings_commands.get(command))}</code>")
                 await auto_delete.delete_command([mes, message])
                 return
     else:
-        mes = await message.reply("Нет такого аргумента\n/help для показа всех команд")
+        mes = await message.reply(
+            f"Неверные аргументы\n<code>!settings {command} {' '.join(settings_commands.get(command))}</code>")
         await auto_delete.delete_command([mes, message])
+        return
 
 
 @Client.on_message(filters.command('help'))
@@ -293,8 +301,36 @@ async def help_message(app: Client, message: Message):
         for i in command_args:
             text.append(f"<code>{config.prefix}settings {command} {i}</code>")
     text.append("\nУзнать значение любой настройки можно с помощью get\nПример: !settings [настройка] get")
+    text.append("!add_admin [юзернеймы разделяя ;]")
     if inline.donate_kb():
         text.append("\nПоддержать проект вы можете по кнопке ниже")
     mes = await message.reply('\n'.join(text), reply_markup=inline.donate_kb())
     await auto_delete.delete_command([mes, message])
     return
+
+
+@Client.on_message(filters.command("add_admin", prefixes="!") & costum_filters.chat_admin_filter & costum_filters.admin_command)
+async def add_admin_func(app: Client, message: Message):
+    if len(message.command) > 1:
+        args = message.text.split(maxsplit=1)
+        admins = args[0].replace(" ", "").split(";")
+        admin_list = []
+        for i in admins:
+            try:
+                admin = (await app.get_users(i)).id
+                admin_list.append(admin)
+            except Exception:
+                pass
+        for admin in admin_list:
+            try:
+                db.add_admin(message.chat.id, admin)
+            except Exception as e:
+                print(e)
+        logger.loggers(message, text="Admins added successfully")
+        mes = await message.reply("Админы успешно добавлены")
+        await auto_delete.delete_command([mes, message])
+        return
+    else:
+        mes = await message.reply("Вы не написали юзеров для добавления")
+        await auto_delete.delete_command([mes, message])
+        return

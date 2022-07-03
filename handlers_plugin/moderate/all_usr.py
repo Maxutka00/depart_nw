@@ -7,12 +7,6 @@ import db
 from pyrogram import filters
 
 
-@Client.on_message(costum_filters.work_filter)
-async def work(app: Client, message: Message):
-    if message.chat.type not in (ChatType.GROUP, ChatType.SUPERGROUP):
-        await message.reply("Просимо вибачення бот тимчасово відключено\n\nЗ однієї або кількох причин:\n— Вийшла з ладу одна з функцій\n- профілактичні виправлення текстів\n- Зміна даних та конфігурації або коду.")
-
-
 @Client.on_message(filters.private, group=5)
 async def all_usr(app, message: Message):
     db.add_user(message.from_user.id)

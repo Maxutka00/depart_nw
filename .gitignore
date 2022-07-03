@@ -1,0 +1,6 @@
+/venv
+statistics.csv
+night_messages.json
+settings.json
+*.session
+*.session-journal

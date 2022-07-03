@@ -31,16 +31,18 @@ async def start(app, message: Message):
 — Трамвай 9
 — Трамвай 19
 
-Також э команди для адміністрації груп, напишить /help'''
+Для того щоб дізнатись команди для адміністрації груп, напишить /help'''
     if inline.donate_kb():
         mes_text += "\n\nВи можете підтримати цей проект за кнопкою нижче"
-    mes = await app.send_message(message.chat.id, mes_text, reply_markup=inline.donate_kb())
     if message.chat.type is ChatType.PRIVATE:
         db.add_user(message.from_user.id)
+        if db.get_user_mail(message.from_user.id) is False:
+            mes_text += "\nДля того щоб знати про зміни в маршрутах, ви можете підписатися на розсилку командою /mail"
     elif message.chat.type in {ChatType.GROUP, ChatType.SUPERGROUP}:
         if db.check_chat(message.chat.id):
             administrators = []
             async for m in app.get_chat_members(message.chat.id, filter=enums.ChatMembersFilter.ADMINISTRATORS):
                 administrators.append(m.user.id)
             db.add_chat(message.chat.id, administrators)
+    mes = await app.send_message(message.chat.id, mes_text, reply_markup=inline.donate_kb())
     await auto_delete.delete_command([message, mes])

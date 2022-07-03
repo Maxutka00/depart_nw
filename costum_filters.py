@@ -1,6 +1,7 @@
 import json
 import os
 import time
+from typing import Union, Optional
 
 from pyrogram.enums.message_entity_type import MessageEntityType
 from pyrogram import filters, types, Client
@@ -8,9 +9,10 @@ from pyrogram.enums import ChatType, ChatMemberStatus
 from pyrogram.types import CallbackQuery, Message
 
 import db
+from func import global_vars, auto_delete
 
 
-async def link_filter_func(_, client, message: types.Message):
+async def link_filter_func(_, client: Client, message: types.Message):
     if not message.text and not message.caption:
         return False
     else:
@@ -24,13 +26,15 @@ async def link_filter_func(_, client, message: types.Message):
     if message.from_user.id in db.get_chat_admins(message.chat.id, int_list=True):
         return False
     user = await client.get_chat_member(message.chat.id, message.from_user.id)
-    if user.status is ChatMemberStatus.OWNER or user.privileges.can_promote_members:
+    if user and user.status is ChatMemberStatus.OWNER or (user.privileges and user.privileges.can_promote_members):
         db.add_admin(message.chat.id, message.from_user.id)
         return False
     good_links = db.get_chat_links_whitelist(message.chat.id, raw_links=True)
     for entity in message.entities:
         if entity.url:
-            if entity.url.split('//')[-1] not in good_links:
+            link = entity.url.split('//')[-1].replace("/", "") if entity.url.split('//')[-1][-1] == "/" else \
+                entity.url.split('//')[-1]
+            if link not in good_links:
                 return True
         elif entity.type == MessageEntityType.URL:
             link_in_text = text[entity.offset:entity.length + entity.offset]
@@ -55,7 +59,8 @@ async def words_blacklist(_, client, message: types.Message):
     if message.from_user.id in db.get_chat_admins(message.chat.id, int_list=True):
         return False
     chat_user = await client.get_chat_member(message.chat.id, message.from_user.id)
-    if chat_user.status is ChatMemberStatus.OWNER or (chat_user.privileges and chat_user.privileges.can_promote_members):
+    if (chat_user.status and chat_user.status is ChatMemberStatus.OWNER) or (
+            chat_user.privileges and chat_user.privileges.can_promote_members):
         db.add_admin(message.chat.id, message.from_user.id)
         return False
     blacklist = db.get_chat_blacklist(message.chat.id)
@@ -90,13 +95,74 @@ async def chat_admin(_, client: Client, message: types.Message):
 chat_admin_filter = filters.create(chat_admin)
 
 
-async def work(_, client: Client, message: Message):
+async def work_user_command(_, client: Client, message: Message):
     with open(os.path.join("data", "settings.json"), "r") as f:
         data = json.load(f)
-    status = data["work"]
+    status = data["user_commands_work"]
     if status is False:
-        return True
-    else:
+        if message.chat.type not in (ChatType.GROUP, ChatType.SUPERGROUP):
+            await message.reply("Ця функція тимчасово на техобслуговуванні")
         return False
+    else:
+        return True
 
-work_filter = filters.create(work)
+
+user_command = filters.create(work_user_command)
+
+
+async def work_admin_command(_, client: Client, message: Message):
+    with open(os.path.join("data", "settings.json"), "r") as f:
+        data = json.load(f)
+    status = data["admins_commands_work"]
+    if status is False:
+        await message.reply("Ця функція тимчасово на техобслуговуванні")
+        return False
+    else:
+        return True
+
+
+admin_command = filters.create(work_admin_command)
+
+states = {}
+infos = {}
+
+
+def state_filter(conversation_level):
+    def func(_, __, message: Message):
+        if isinstance(message, CallbackQuery):
+            chat_id = message.message.chat.id
+        else:
+            chat_id = message.chat.id
+        data = states.get(f"{message.from_user.id};{chat_id}")
+        if data and conversation_level == "*":
+            return True
+        return data == conversation_level
+
+    return filters.create(func, "ConversationFilter")
+
+
+def set_state(chat_id: int, user_id: int, state: Optional[str]):
+    if state is None:
+        states.pop(f"{user_id};{chat_id}")
+    else:
+        states.update({f"{user_id};{chat_id}": state})
+
+
+def update_data(chat_id: int, user_id: int, **data):
+    infos.update({f"{user_id};{chat_id}": {**data}})
+
+
+def get_data(chat_id: int, user_id: int):
+    return infos.get(f"{user_id};{chat_id}")
+
+
+async def parse_filter(_, client, message: types.Message):
+    if global_vars.status.get_parsing_status:
+        mes = await message.reply("На даний хвилину бот оновлює дані, спробуйте ще раз через 2-3 хвилини")
+        await auto_delete.delete_command([mes], 15)
+        return False
+    else:
+        return True
+
+
+not_parse = filters.create(parse_filter)

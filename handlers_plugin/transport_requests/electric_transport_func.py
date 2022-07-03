@@ -8,6 +8,7 @@ from pyrogram import filters, Client
 from pyrogram.enums import ParseMode
 from pyrogram.types import Message, CallbackQuery, InputMediaPhoto
 
+import costum_filters
 import func.translit
 from func import auto_delete
 from keyboards.inline import electric_transport_kb
@@ -29,7 +30,7 @@ transport_requests = {}
 troll_nn = r"(^|\b)((тро(лл|л)ейбус +(\d+|А|Б))|(трамвай +\d+))|(((\d+|А|Б) +тро(лл|л)ейбус)|(\d+ +трамвай))(^|\b)"
 
 
-@Client.on_message(filters.regex(troll_nn, re.I))
+@Client.on_message(filters.regex(troll_nn, re.I) & costum_filters.not_parse & costum_filters.user_command)
 async def tram_troll_request(app: Client, message: Message):
     for match in message.matches:
         logger.loggers(message, text=f"Электротранспорт = {match.group()}")
@@ -47,9 +48,11 @@ async def tram_troll_request(app: Client, message: Message):
             if not photo:
                 return
             else:
+                logger.log_transport(name, num.lower(), message.from_user.id)
                 photo = os.path.join("parsing", "photos", photo[0])
                 caption = ''
         else:
+            logger.log_transport(name, num.lower(), message.from_user.id)
             photo = os.path.join("data", "stop_choose.png")
             caption = ""
         mes = await app.send_photo(message.chat.id, photo,
@@ -57,7 +60,10 @@ async def tram_troll_request(app: Client, message: Message):
                                    reply_to_message_id=message.reply_to_message_id or message.id,
                                    parse_mode=ParseMode.HTML,
                                    reply_markup=kb)
-        transport_requests.update({mes.id: [message.from_user.id, message]})
+        if message.text == match.group():
+            transport_requests.update({mes.id: [message.from_user.id, message]})
+        else:
+            transport_requests.update({mes.id: [message.from_user.id]})
         messages = [mes]
         if message.text == match.group():
             messages.append(message)
@@ -81,4 +87,4 @@ async def change_stop(app: Client, callback_query: CallbackQuery):
         await callback_query.message.edit_reply_markup(None)
     await callback_query.message.edit_media(InputMediaPhoto(photo))
     await auto_delete.delete_timetable(
-        [callback_query.message, user[1] if user else callback_query.message.reply_to_message])
+        [callback_query.message, user[1] if user and len(user) > 1 else None])
