@@ -1,36 +1,38 @@
+import json
+import logging
 import os
 
 from pyrogram import Client
 from loguru import logger
 import config
 import db
-from func.except_hook import log_uncaught_exceptions
-from parsing.parse import transport_parse, electric_transport_parse
+from parsing.parse import transport_parse, electric_transport_parse, bus_parse_func
 from schedulers import on_night_mode, off_night_mode, night_mode_scheduler, bus_parse_scheduler, \
     electric_transport_scheduler
-import sys
 logger.add("logs/logger.log", rotation="15 MB", level=5, backtrace=True, diagnose=True, enqueue=True)
 
-#sys.excepthook = log_uncaught_exceptions
 if not os.path.exists(os.path.join("data", "night_messages.json")):
     with open(os.path.join("data", "night_messages.json"), "w") as f:
         f.write("{}")
 if not os.path.exists(os.path.join("data", "settings.json")):
     with open(os.path.join("data", "settings.json"), "w") as f:
-        f.write('{"work": true}')
+        settings = {"user_commands_work": True, "admins_commands_work": True}
+        json.dump(settings, f)
 if not os.path.exists(os.path.join("parsing", "photos")):
     os.mkdir(os.path.join("parsing", "photos"))
 
 plugins = dict(
     root="handlers_plugin",
     include=[
+        "admins_handlers.change_work",
         "moderate.white_channel",
-        "moderate.change_work",
+        "admins_handlers.get_statistics",
+        "admins_handlers.change_work",
         "moderate.all_usr",
         "commands.start",
         "commands.stop",
         "commands.del",
-        "commands.send_log",
+        "admins_handlers.send_log",
         "transport_requests.bus_func",
         "transport_requests.electric_transport_func",
         "join_left_chat_member.self_join_left",
@@ -40,10 +42,10 @@ plugins = dict(
         "moderate.forbidden_word",
         "moderate.white_link",
         "moderate.change_group_settings",
-        "moderate.parse_by_command",
+        "admins_handlers.parse_by_command",
         "moderate.report_warns",
-        "moderate.mailer",
-
+        "commands.mailer",
+        "commands.cancel",
     ]
 )
 
@@ -71,9 +73,10 @@ for chat in db.get_all_chats():
 logger.info('------------------------------')
 logger.info('Prepearing a telegram bot')
 night_mode_scheduler.start()
-bus_parse_scheduler.add_job(transport_parse, "interval", hours=2)
+bus_parse_scheduler.add_job(bus_parse_func, "interval", hours=2)
 bus_parse_scheduler.start()
-electric_transport_scheduler.add_job(electric_transport_parse, "cron", hour=3, minute=0)
+electric_transport_scheduler.add_job(electric_transport_parse, "cron", hour=4, minute=0)
+electric_transport_scheduler.add_job(electric_transport_parse, "cron", hour=13, minute=0)
 electric_transport_scheduler.start()
 db.add_transport(transport_parse())
 logger.info('Starting a telegram bot')

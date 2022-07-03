@@ -21,7 +21,7 @@ async def message_deleter(message, time: int = 180):
         print(e)
 
 
-@Client.on_message(filters.command("report", prefixes=["/", "!"]) & filters.group & filters.reply)
+@Client.on_message(filters.command("report", prefixes=["/", "!"]) & filters.group & filters.reply & costum_filters.user_command)
 async def report(app: Client, message: Message):
     await message.delete()
     report_chat = db.get_report_chat(message.chat.id)
@@ -38,6 +38,13 @@ async def report(app: Client, message: Message):
     mes = await message.reply("Ваше сообщение было доставлено администрации")
     messages = [mes, message]
     await auto_delete.delete_command(messages)
+
+
+@Client.on_message(filters.command("report", prefixes=["/", "!"]) & filters.group & ~filters.reply)
+async def err_report(app: Client, message: Message):
+    mes = await message.reply("Вы не ответили на сообщение")
+    messages = [mes, message]
+    await auto_delete.delete_command(messages, 10)
 
 
 @Client.on_message(filters.command(["warn", "w"], prefixes=["/",
@@ -68,6 +75,7 @@ async def warn(app: Client, message: Message):
             logger.loggers(message, text="использован !warn_del:status [Нoмер варна указан не верно]")
             mes = await message.reply("Нoмер варна указан не верно")
     else:
+        await message.delete()
         reason = message.text.split(maxsplit=1)[1]
         num_warn = db.add_warn(message.chat.id, message.reply_to_message.from_user.id, reason)
         if num_warn == 1:
@@ -77,33 +85,42 @@ async def warn(app: Client, message: Message):
         else:
             hours = 24 * 2
 
-
         try:
             await app.restrict_chat_member(message.chat.id, message.reply_to_message.from_user.id, ChatPermissions(),
                                            datetime.now() + timedelta(hours=hours))
         except (UserAdminInvalid, ChatAdminRequired):
             logger.loggers(message, text="использован !warn: [варн добавлен, но у бота нет прав на мут]")
             mes1 = await message.reply('Варн добавлен, но у бота нет прав на мут')
-            punishment = "нет"
+            punishment = "немає"
         except ChannelInvalid:
             logger.loggers(message, text="использован !warn: [Варн добавлен, но мут работает только в супергруппах]")
             mes1 = await message.reply('Варн добавлен, но мут работает только в супергруппах')
-            punishment = "нет"
+            punishment = "немає"
         else:
-            punishment = f"мут {hours}ч."
-            logger.loggers(message, text=f"использован !warn: [Вам был выдан варн. Всего их у вас {num_warn}\nПричина: {reason}\nНаказание: {punishment}]")
+            punishment = f"read-only {hours}год."
+            logger.loggers(message,
+                           text=f"использован !warn: [Вам был выдан варн. Всего их у вас {num_warn}\nПричина: {reason}\nНаказание: {punishment}]")
         mes = await app.send_message(message.chat.id,
-                                     f"Вам был выдан варн. Всего их у вас {num_warn}\nПричина: {reason}\nНаказание: {punishment}",
+                                     f"Вам було видано попередження\nКолличество попереджень : {num_warn}\nПричина попередження: {reason}\nШтраф: {punishment}",
                                      reply_to_message_id=message.reply_to_message_id)
     await auto_delete.delete_command([mes, message, mes1])
 
 
 @Client.on_message(
-    filters.command(["info"], prefixes=["/", "!"]) & filters.group & filters.reply & costum_filters.chat_admin_filter)
+    filters.command(["info"], prefixes=["/", "!"]) & filters.group & costum_filters.chat_admin_filter)
 async def info(app: Client, message: Message):
     logger.loggers(message, text="использован !info")
-    warns = db.get_warns(message.chat.id, message.reply_to_message.from_user.id)
-    text = f"Юзер: {message.reply_to_message.from_user.mention}\nID: <code>{message.reply_to_message.from_user.id}</code>"
+    if message.reply_to_message:
+        user = message.reply_to_message.from_user.id
+    elif len(message.text.split()) > 1:
+        user = await app.get_users(message.text.split()[1])
+    else:
+        mes = await message.reply("Вы не ответили на сообщение юзера/не написали его id")
+        await auto_delete.delete_command([mes, message])
+        return
+
+    warns = db.get_warns(message.chat.id, user.id)
+    text = f"Юзер: {user.mention}\nID: <code>{user.id}</code>"
     text_warns = []
     if not warns:
         text_warns = ["Варнов нет"]
@@ -120,7 +137,8 @@ async def unmute(app: Client, callback_query: CallbackQuery):
     try:
         await app.restrict_chat_member(callback_query.message.chat.id, user, callback_query.message.chat.permissions)
     except (UserAdminInvalid, ChatAdminRequired):
-        logger.loggers(callback_query, text=f"использован !info[callback]:[{callback_query.message.text} У бота нет прав]")
+        logger.loggers(callback_query,
+                       text=f"использован !info[callback]:[{callback_query.message.text} У бота нет прав]")
         await callback_query.message.edit(f"{callback_query.message.text}\n<i>У бота нет прав</i>")
         return
     logger.loggers(callback_query, text=f"использован !info[callback]:[{callback_query.message.text} Мут снят]")
