@@ -89,6 +89,8 @@ async def chat_admin(_, client: Client, message: types.Message):
         db.add_admin(chat, message.from_user.id)
         return True
     else:
+        mes = await message.reply("Вибачайте але ця команда працює тільки для адміністрації чата")
+        await auto_delete.delete_command([mes, message])
         return False
 
 
@@ -166,3 +168,13 @@ async def parse_filter(_, client, message: types.Message):
 
 
 not_parse = filters.create(parse_filter)
+
+
+async def group_filter(_, client, message: types.Message):
+    if not filters.group_filter(_, client, message):
+        await message.reply("Вибачайте але ця команда працює тільки в чаті")
+        return False
+    else:
+        return True
+
+group = filters.create(group_filter)

@@ -21,7 +21,7 @@ async def message_deleter(message, time: int = 180):
         print(e)
 
 
-@Client.on_message(filters.command("report", prefixes=["/", "!"]) & filters.group & filters.reply & costum_filters.user_command)
+@Client.on_message(filters.command("report", prefixes=["/", "!"]) & costum_filters.group & filters.reply & costum_filters.user_command)
 async def report(app: Client, message: Message):
     await message.delete()
     report_chat = db.get_report_chat(message.chat.id)
@@ -40,7 +40,7 @@ async def report(app: Client, message: Message):
     await auto_delete.delete_command(messages)
 
 
-@Client.on_message(filters.command("report", prefixes=["/", "!"]) & filters.group & ~filters.reply)
+@Client.on_message(filters.command("report", prefixes=["/", "!"]) & costum_filters.group & ~filters.reply)
 async def err_report(app: Client, message: Message):
     mes = await message.reply("Вы не ответили на сообщение")
     messages = [mes, message]
@@ -48,7 +48,7 @@ async def err_report(app: Client, message: Message):
 
 
 @Client.on_message(filters.command(["warn", "w"], prefixes=["/",
-                                                            "!"]) & filters.group & filters.reply & costum_filters.chat_admin_filter)
+                                                            "!"]) & costum_filters.group & filters.reply & costum_filters.chat_admin_filter)
 async def warn(app: Client, message: Message):
     if message.sender_chat:
         logger.loggers(message, text="used !warn [Невозможно выдать варн, человек пишет не от своего имени]")
@@ -107,7 +107,7 @@ async def warn(app: Client, message: Message):
 
 
 @Client.on_message(
-    filters.command(["info"], prefixes=["/", "!"]) & filters.group & costum_filters.chat_admin_filter)
+    filters.command(["info"], prefixes=["/", "!"]) & costum_filters.group & costum_filters.chat_admin_filter)
 async def info(app: Client, message: Message):
     logger.loggers(message, text="использован !info")
     if message.reply_to_message:
