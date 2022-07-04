@@ -298,7 +298,11 @@ async def help_message(app: Client, message: Message):
     mes = None
     if message.chat.type is not ChatType.PRIVATE:
         mes = await message.reply("Отправил в лс")
-    text = ["<b>Все команды для администрации группы:</b>"]
+    text = []
+    text.append("<b>Все команды для юзеров:</b>\n"
+                "<code>!report</code> - отправляет сообщение, на которое вы ответили, администрации\n"
+                "<code>!mail</code> - подписаться/отписаться на/от рассылки")
+    text.append("\n<b>Все команды для администрации группы:</b>")
     for command in settings_commands:
         command_args = settings_commands.get(command)
         for i in command_args:
@@ -307,10 +311,7 @@ async def help_message(app: Client, message: Message):
     text.append("<code>!warn [причина]</code> - выдаёт юзеру варн и мут(1 варн - 3ч, 2 варн - 24ч, больше 3 варнов - 48ч)\n"
                 "<code>!warn del [номер варна]</code> - удаляет варн\n"
                 "<code>!info</code> показывает все варны юзера на чьё сообщение вы ответили\n"
-                "<code>!add_admin [юзернеймы разделяя ;]</code> - добовляет юзера в администрацию чата(открывает доступ к командам выше)\n\n"
-                "<b>Все команды для юзеров:</b>\n"
-                "<code>!report</code> - отправляет сообщение, на которое вы ответили, администрации\n"
-                "<code>!mail</code> - подписаться/отписаться на/от рассылки")
+                "<code>!add_admin [юзернеймы разделяя ;]</code> - добовляет юзера в администрацию чата(открывает доступ к командам выше)")
     if message.from_user.id in config.admins:
         text.append("\n<b>Команды для тех персонала:</b>")
         text.append("<code>/mailer [1 - c подпиской, 0 - всем]</code>\n<code>/repair</code>\n<code>/parse</code>\n<code>/stop</code> - остановка бота\n<code>/send_log</code>")
