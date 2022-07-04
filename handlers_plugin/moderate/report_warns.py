@@ -21,7 +21,8 @@ async def message_deleter(message, time: int = 180):
         print(e)
 
 
-@Client.on_message(filters.command("report", prefixes=["/", "!"]) & costum_filters.group & filters.reply & costum_filters.user_command)
+@Client.on_message(
+    filters.command("report", prefixes=["/", "!"]) & costum_filters.group & filters.reply & costum_filters.user_command)
 async def report(app: Client, message: Message):
     await message.delete()
     report_chat = db.get_report_chat(message.chat.id)
@@ -101,9 +102,20 @@ async def warn(app: Client, message: Message):
             logger.loggers(message,
                            text=f"использован !warn: [Вам был выдан варн. Всего их у вас {num_warn}\nПричина: {reason}\nНаказание: {punishment}]")
         mes = await app.send_message(message.chat.id,
-                                     f"Вам було видано попередження\nКолличество попереджень : {num_warn}\nПричина попередження: {reason}\nШтраф: {punishment}",
+                                     f"{message.reply_to_message.from_user.mention}, Вам було видано попередження\nКолличество попереджень : {num_warn}\nПричина попередження: {reason}\nШтраф: {punishment}",
                                      reply_to_message_id=message.reply_to_message_id)
+    try:
+        await message.reply_to_message.delete()
+    except Exception:
+        pass
     await auto_delete.delete_command([mes, message, mes1])
+
+
+@Client.on_message(filters.command(commands=["warn", "w"], prefixes=["/", "!"]) & costum_filters.group & ~filters.reply)
+async def err_report(app: Client, message: Message):
+    mes = await message.reply("Вы не ответили на сообщение")
+    messages = [mes, message]
+    await auto_delete.delete_command(messages, 10)
 
 
 @Client.on_message(
@@ -137,9 +149,6 @@ async def unmute(app: Client, callback_query: CallbackQuery):
     try:
         await app.restrict_chat_member(callback_query.message.chat.id, user, callback_query.message.chat.permissions)
     except (UserAdminInvalid, ChatAdminRequired):
-        logger.loggers(callback_query,
-                       text=f"использован !info[callback]:[{callback_query.message.text} У бота нет прав]")
         await callback_query.message.edit(f"{callback_query.message.text}\n<i>У бота нет прав</i>")
         return
-    logger.loggers(callback_query, text=f"использован !info[callback]:[{callback_query.message.text} Мут снят]")
     await callback_query.message.edit(f"{callback_query.message.text}\nМут снят")
