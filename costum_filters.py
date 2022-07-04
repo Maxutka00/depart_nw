@@ -89,8 +89,11 @@ async def chat_admin(_, client: Client, message: types.Message):
         db.add_admin(chat, message.from_user.id)
         return True
     else:
-        mes = await message.reply("Вибачайте але ця команда працює тільки для адміністрації чата")
-        await auto_delete.delete_command([mes, message])
+        if isinstance(message, CallbackQuery):
+            await message.answer("Вибачайте але ця команда працює тільки для адміністрації чата", show_alert=True)
+        elif isinstance(message, Message):
+            mes = await message.reply("Вибачайте але ця команда працює тільки для адміністрації чата")
+            await auto_delete.delete_command([mes, message])
         return False
 
 
