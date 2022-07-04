@@ -4,7 +4,7 @@ import re
 
 from apscheduler.jobstores.base import JobLookupError
 from pyrogram import Client, filters
-from pyrogram.enums import ChatMemberStatus, ChatMembersFilter
+from pyrogram.enums import ChatMemberStatus, ChatMembersFilter, ChatType
 from pyrogram.types import Message
 
 import config
@@ -26,7 +26,7 @@ settings_commands = {
 
 
 @Client.on_message(
-    filters.command('settings', prefixes=config.prefix) & filters.group & costum_filters.chat_admin_filter & costum_filters.admin_command)
+    filters.command('settings', prefixes=config.prefix) & costum_filters.group & costum_filters.chat_admin_filter & costum_filters.admin_command)
 async def change_settings(app: Client, message: Message):
     
     db.add_chat(message.chat.id, [(i.user.id if i.status == ChatMemberStatus.OWNER else ...) async for i in
@@ -295,16 +295,28 @@ async def change_settings(app: Client, message: Message):
 
 @Client.on_message(filters.command('help'))
 async def help_message(app: Client, message: Message):
+    mes = None
+    if message.chat.type is not ChatType.PRIVATE:
+        mes = await message.reply("Отправил в лс")
     text = ["<b>Все команды для администрации группы:</b>"]
     for command in settings_commands:
         command_args = settings_commands.get(command)
         for i in command_args:
             text.append(f"<code>{config.prefix}settings {command} {i}</code>")
-    text.append("\nУзнать значение любой настройки можно с помощью get\nПример: !settings [настройка] get")
-    text.append("!add_admin [юзернеймы разделяя ;]")
+    text.append("Узнать значение любой настройки можно с помощью get\nПример: !settings [настройка] get")
+    text.append("<code>!warn [причина]</code> - выдаёт юзеру варн и мут(1 варн - 3ч, 2 варн - 24ч, больше 3 варнов - 48ч)\n"
+                "<code>!warn del [номер варна]</code> - удаляет варн\n"
+                "<code>!info</code> показывает все варны юзера на чьё сообщение вы ответили\n"
+                "<code>!add_admin [юзернеймы разделяя ;]</code> - добовляет юзера в администрацию чата(открывает доступ к командам выше)\n\n"
+                "<b>Все команды для юзеров:</b>\n"
+                "<code>!report</code> - отправляет сообщение, на которое вы ответили, администрации\n"
+                "<code>!mail</code> - подписаться/отписаться на/от рассылки")
+    if message.from_user.id in config.admins:
+        text.append("\n<b>Команды для тех персонала:</b>")
+        text.append("<code>/mailer [1 - c подпиской, 0 - всем]</code>\n<code>/repair</code>\n<code>/parse</code>\n<code>/stop</code> - остановка бота\n<code>/send_log</code>")
     if inline.donate_kb():
-        text.append("\nПоддержать проект вы можете по кнопке ниже")
-    mes = await message.reply('\n'.join(text), reply_markup=inline.donate_kb())
+        text.append("\nВи можете підтримати ЗСУ за кнопкою нижче")
+    await app.send_message(message.from_user.id, '\n'.join(text), reply_markup=inline.donate_kb())
     await auto_delete.delete_command([mes, message])
     return
 
