@@ -2,9 +2,8 @@ parsing_transport_status = False
 
 
 class status:
-
-    @property
-    def get_parsing_status(self):
+    @staticmethod
+    def get_parsing_status():
         return parsing_transport_status
 
     @staticmethod
