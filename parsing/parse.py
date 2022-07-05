@@ -120,7 +120,7 @@ def electric_transport_parse():
             for num_way in electric_transport.get(transport):
                 data = {}
                 link = f"https://det-dnipro.dp.ua/{num_way}-{transport + 'vaj' if transport == 'tram' else transport}"
-                # link = "https://det-dnipro.dp.ua/14-tramvaj/"
+                #link = "https://det-dnipro.dp.ua/11-tramvaj/"
                 print(f"Request to {link}")
                 q = time.time()
                 r = requests.get(link)
@@ -223,14 +223,12 @@ def electric_transport_parse():
                 create_image.render(data)
                 print(r, w - q, 'сек')
                 print()
-                # return
     except Exception as e:
         for tech_admin in config.admins:
             requests.post(
                 f"https://api.telegram.org/bot{config.TOKEN}/sendMessage?chat_id={tech_admin}&text=Ошибка при парсинге {link}\n\n{traceback.format_exc()}")
         print(dir(e))
-    finally:
-        global_vars.status.set_parsing_status(False)
+    global_vars.status.set_parsing_status(False)
 
 
 def bus_parse_func():

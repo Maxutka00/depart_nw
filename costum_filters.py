@@ -162,7 +162,7 @@ def get_data(chat_id: int, user_id: int):
 
 
 async def parse_filter(_, client, message: types.Message):
-    if global_vars.status.get_parsing_status:
+    if global_vars.status.get_parsing_status():
         mes = await message.reply("На даний хвилину бот оновлює дані, спробуйте ще раз через 2-3 хвилини")
         await auto_delete.delete_command([mes], 15)
         return False
@@ -174,7 +174,7 @@ not_parse = filters.create(parse_filter)
 
 
 async def group_filter(_, client, message: types.Message):
-    if not filters.group_filter(_, client, message):
+    if not await filters.group_filter(_, client, message):
         await message.reply("Вибачайте але ця команда працює тільки в чаті")
         return False
     else:
