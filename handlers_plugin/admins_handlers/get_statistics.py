@@ -17,9 +17,9 @@ names = {"trol": "Тролейбус", "tram": "Трамвай", "bus": "Авт�
 
 
 def create_files_in_memort(df: DataFrame):
-    df_bus = df[df.transport == "bus"].groupby("num")["num"].count()
-    df_tram = df[df.transport == "tram"].groupby("num")["num"].count()
-    df_trol = df[df.transport == "trol"].groupby("num")["num"].count()
+    df_bus = df[df.transport == "bus"].groupby("num")["num"].count().sort_values(ascending=False)
+    df_tram = df[df.transport == "tram"].groupby("num")["num"].count().sort_values(ascending=False)
+    df_trol = df[df.transport == "trol"].groupby("num")["num"].count().sort_values(ascending=False)
     transport = [df_trol, df_tram, df_bus]
     output_files = []
     for i in range(len(transport)):
