@@ -120,7 +120,7 @@ def electric_transport_parse():
             for num_way in electric_transport.get(transport):
                 data = {}
                 link = f"https://det-dnipro.dp.ua/{num_way}-{transport + 'vaj' if transport == 'tram' else transport}"
-                link = "https://det-dnipro.dp.ua/12-trol/"
+                #link = "https://det-dnipro.dp.ua/12-trol/"
                 print(f"Request to {link}")
                 q = time.time()
                 r = requests.get(link)
@@ -222,8 +222,8 @@ def electric_transport_parse():
                 w = time.time()
                 create_image.render(data)
                 print(r, w - q, 'сек')
-                print(data)
-                return
+                print()
+                #return
     except Exception as e:
         for tech_admin in config.admins:
             requests.post(
