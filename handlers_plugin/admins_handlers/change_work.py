@@ -20,7 +20,7 @@ async def change_work(app: Client, message: Message):
 
 @Client.on_callback_query(filters.regex("change_user_commands_work") & filters.user(config.admins))
 async def change_work_query1(app: Client, callback_query: CallbackQuery):
-    await callback_query.answer("dsdsd")
+    await callback_query.answer()
     with open(os.path.join("data", "settings.json"), "r") as f:
         data = json.load(f)
     data["user_commands_work"] = data["user_commands_work"] is False
