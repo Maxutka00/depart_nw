@@ -58,11 +58,16 @@ async def words_blacklist(_, client, message: types.Message):
         return False
     if message.from_user.id in db.get_chat_admins(message.chat.id, int_list=True):
         return False
-    chat_user = await client.get_chat_member(message.chat.id, message.from_user.id)
-    if (chat_user.status and chat_user.status is ChatMemberStatus.OWNER) or (
-            chat_user.privileges and chat_user.privileges.can_promote_members):
-        db.add_admin(message.chat.id, message.from_user.id)
-        return False
+    try:
+        chat_user = await client.get_chat_member(message.chat.id, message.from_user.id)
+        if (chat_user.status and chat_user.status is ChatMemberStatus.OWNER) or (
+                chat_user.privileges and chat_user.privileges.can_promote_members):
+            db.add_admin(message.chat.id, message.from_user.id)
+            return False
+
+    except Exception:
+        pass
+
     blacklist = db.get_chat_blacklist(message.chat.id)
     if not blacklist:
         return False
