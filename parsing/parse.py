@@ -140,9 +140,6 @@ def electric_transport_parse():
                     active = []
                     stop_classes = []
                     for i in css.cssRules:
-                        if i.style.color == '#999':
-                            active.append(i.selectorText.replace('.', '').split()[-1])
-                            continue
                         if (i.style.textAlign == 'center' and i.style.fontFamily.replace(' ',
                                                                                          '') == '"docs-Calibri",Arial' and
                                 i.style.fontWeight == "bold"):
