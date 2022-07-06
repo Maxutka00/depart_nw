@@ -120,7 +120,7 @@ def electric_transport_parse():
             for num_way in electric_transport.get(transport):
                 data = {}
                 link = f"https://det-dnipro.dp.ua/{num_way}-{transport + 'vaj' if transport == 'tram' else transport}"
-                #link = "https://det-dnipro.dp.ua/11-tramvaj/"
+                link = "https://det-dnipro.dp.ua/12-trol/"
                 print(f"Request to {link}")
                 q = time.time()
                 r = requests.get(link)
@@ -186,9 +186,9 @@ def electric_transport_parse():
                         if find and find.text:
                             skip = True
                             stop = find or cols[0]
-                            direction = re.search(r'(?<=(\(напрямок до )).+(?=\))', stop.text)
+                            direction = re.search(r'(?<=(\(напрямок до)).+(?=\))', stop.text)
                             if direction:
-                                direction = direction.group()
+                                direction = direction.group().strip()
                             else:
                                 direction = ''
                             stop = stop.text.split('(')[0].strip()
@@ -222,7 +222,8 @@ def electric_transport_parse():
                 w = time.time()
                 create_image.render(data)
                 print(r, w - q, 'сек')
-                print()
+                print(data)
+                return
     except Exception as e:
         for tech_admin in config.admins:
             requests.post(
