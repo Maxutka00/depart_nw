@@ -120,7 +120,8 @@ async def work_admin_command(_, client: Client, message: Message):
         data = json.load(f)
     status = data["admins_commands_work"]
     if status is False:
-        await message.reply("Ця функція тимчасово на техобслуговуванні")
+        mes = await message.reply("Ця функція тимчасово на техобслуговуванні")
+        await auto_delete.delete_command([mes, message])
         return False
     else:
         return True

@@ -52,7 +52,7 @@ async def autobus_request(app: Client, message: Message):
 regex_for_incorrect_input = r"^(1|2|4|5|6|7|9|10|15|18|20|21|21а|21б|22|23|25|27|29|31|32|33|34|35|36|37|38|39|40|41|42|43|44|48|50|51|54|55|56|57а|58|59|60|62|64|64г|70|73|75|77|82|85|86|87а|87б|88|90|91|92|95|95а|96|98|100|101а|106|107|108|109|111|113|115|118|119|120|121|124а|125|127|134|136|136а|137|141|146|146а|146б|149|151а|152|153|155|156|156а|157а|158|177)$"
 
 
-@Client.on_message(filters.regex(regex_for_incorrect_input, re.I) & (filters.chat(config.chat_dp_id) | filters.private) & costum_filters.user_command)
+@Client.on_message(filters.regex(regex_for_incorrect_input, re.I) & (filters.chat(config.chat_dp_id) | filters.private))
 async def incorrect_input(app: Client, message: Message):
     logger.loggers(message, text=f"маршрут = [НЕВЕРНО]")
     mes = await message.reply_text(

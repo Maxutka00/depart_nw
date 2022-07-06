@@ -9,7 +9,14 @@ import db
 
 async def delete_command(messages_: Union[Message, List[Message], Tuple[Message]], time: int = None):
     async def delete_command_func(messages: List[Message]):
-        if messages[0].chat.type in {ChatType.GROUP, ChatType.SUPERGROUP}:
+        a = None
+        for i in messages_:
+            if i is None:
+                continue
+            else:
+                a = i
+                break
+        if a and a.chat.type in {ChatType.GROUP, ChatType.SUPERGROUP}:
             if not db.check_chat(messages[0].chat.id):
                 return
             if time is None:

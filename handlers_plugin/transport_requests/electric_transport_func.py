@@ -30,7 +30,7 @@ transport_requests = {}
 troll_nn = r"(^|\b)((тро(лл|л)ейбус +(\d+|А|Б))|(трамвай +\d+))|(((\d+|А|Б) +тро(лл|л)ейбус)|(\d+ +трамвай))(^|\b)"
 
 
-@Client.on_message(filters.regex(troll_nn, re.I) & costum_filters.not_parse & costum_filters.user_command)
+@Client.on_message(filters.regex(troll_nn, re.I) & costum_filters.user_command & costum_filters.not_parse)
 async def tram_troll_request(app: Client, message: Message):
     for match in message.matches:
         logger.loggers(message, text=f"Электротранспорт = {match.group()}")
