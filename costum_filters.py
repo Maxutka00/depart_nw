@@ -95,9 +95,9 @@ async def chat_admin(_, client: Client, message: types.Message):
         return True
     else:
         if isinstance(message, CallbackQuery):
-            await message.answer("Вибачайте але ця команда працює тільки для адміністрації чата", show_alert=True)
+            await message.answer("Вибачайте, ця команда працює тільки для адміністрації чату", show_alert=True)
         elif isinstance(message, Message):
-            mes = await message.reply("Вибачайте але ця команда працює тільки для адміністрації чата")
+            mes = await message.reply("Вибачайте, ця команда працює тільки для адміністрації чату")
             await auto_delete.delete_command([mes, message])
         return False
 
@@ -111,7 +111,7 @@ async def work_user_command(_, client: Client, message: Message):
     status = data["user_commands_work"]
     if status is False:
         if message.chat.type not in (ChatType.GROUP, ChatType.SUPERGROUP):
-            await message.reply("Ця функція тимчасово на техобслуговуванні")
+            await message.reply("Ця функція тимчасово не працює, через оновлення бота")
         return False
     else:
         return True
@@ -125,8 +125,7 @@ async def work_admin_command(_, client: Client, message: Message):
         data = json.load(f)
     status = data["admins_commands_work"]
     if status is False:
-        mes = await message.reply("Ця функція тимчасово на техобслуговуванні")
-        await auto_delete.delete_command([mes, message])
+        await message.reply("Ця функція тимчасово не працює, через оновлення бота")
         return False
     else:
         return True
@@ -169,7 +168,7 @@ def get_data(chat_id: int, user_id: int):
 
 async def parse_filter(_, client, message: types.Message):
     if global_vars.status.get_parsing_status():
-        mes = await message.reply("На даний хвилину бот оновлює дані, спробуйте ще раз через 2-3 хвилини")
+        mes = await message.reply("Зараз бот оновлює дані, щоб вони були актуальні. Спробуйте ще раз через 2-3 хвилини, дякуємо!")
         await auto_delete.delete_command([mes], 15)
         return False
     else:
@@ -181,7 +180,7 @@ not_parse = filters.create(parse_filter)
 
 async def group_filter(_, client, message: types.Message):
     if not await filters.group_filter(_, client, message):
-        await message.reply("Вибачайте але ця команда працює тільки в чаті")
+        await message.reply("Вибачайте, ця команда працює тільки в чатах")
         return False
     else:
         return True

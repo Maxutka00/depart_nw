@@ -120,7 +120,7 @@ def electric_transport_parse():
             for num_way in electric_transport.get(transport):
                 data = {}
                 link = f"https://det-dnipro.dp.ua/{num_way}-{transport + 'vaj' if transport == 'tram' else transport}"
-                #link = "https://det-dnipro.dp.ua/12-trol/"
+                # link = "https://det-dnipro.dp.ua/1-tramvaj/"
                 print(f"Request to {link}")
                 q = time.time()
                 r = requests.get(link)
@@ -136,16 +136,19 @@ def electric_transport_parse():
                     table_r = requests.get(link_to_table)
                     soup = BeautifulSoup(table_r.text, "lxml")
                     css = soup.find("style", type="text/css").text
-                    css = cssutils.parseString(css)
+                    css = cssutils.parseString(css).cssRules
                     active = []
                     stop_classes = []
-                    for i in css.cssRules:
+                    border_classes = ["s0"]
+                    for i in css:
                         if (i.style.textAlign == 'center' and i.style.fontFamily.replace(' ',
                                                                                          '') == '"docs-Calibri",Arial' and
                                 i.style.fontWeight == "bold"):
                             if i.style.fontSize.replace("pt", "").isdigit() and int(
                                     i.style.fontSize.replace("pt", "")) >= 5:
                                 stop_classes.append(i.selectorText.replace('.', '').split()[-1])
+
+
                         elif i.style.color == '#000':
                             active.append(i.selectorText.replace('.', '').split()[-1])
                             continue
@@ -202,7 +205,7 @@ def electric_transport_parse():
                             class_ = col["class"][0].split()[0]
                             if len(col['class']) > 1 and col['class'][1] == 'softmerge':
                                 minute = col.find('div').text
-                            if class_ in ('s0', 's10', 's9') and col.text == '':
+                            if class_ in border_classes and col.text == '':
                                 continue
                             elif class_ not in active or col.text == '':
                                 minute = None
@@ -219,13 +222,13 @@ def electric_transport_parse():
                 w = time.time()
                 create_image.render(data)
                 print(r, w - q, 'сек')
-                print()
-                #return
     except Exception as e:
         for tech_admin in config.admins:
-            requests.post(
+            a = requests.post(
                 f"https://api.telegram.org/bot{config.TOKEN}/sendMessage?chat_id={tech_admin}&text=Ошибка при парсинге {link}\n\n{traceback.format_exc()}")
-        print(dir(e))
+            print(a)
+        global_vars.status.set_parsing_status(False)
+        raise e
     global_vars.status.set_parsing_status(False)
 
 
