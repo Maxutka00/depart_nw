@@ -56,7 +56,7 @@ regex_for_incorrect_input = r"^(1|2|4|5|6|7|9|10|15|18|20|21|21а|21б|22|23|25|
 async def incorrect_input(app: Client, message: Message):
     logger.loggers(message, text=f"маршрут = [НЕВЕРНО]")
     mes = await message.reply_text(
-        "будь ласка дотримуйтесь правильності написання повідомлення за шаблоном, які написані нижче.\n\nнапишіть:\nавтобус [номер автобуса]\n— автобус 151а\n— автобус 77\n— автобус 1")
+        "Будь ласка, дотримуйтесь правильності написання повідомлення за шаблоном, які написані нижче.\n\nнапишіть:\nавтобус [номер автобуса]\n— автобус 151а\n— автобус 77\n— автобус 1")
 
     messages = [mes]
     if message.text == message.matches[0].group():
@@ -67,7 +67,7 @@ async def incorrect_input(app: Client, message: Message):
 @Client.on_message(filters.regex(r"(^|\b)(маршрутк\w*) +\d+[АБГ]?(^|\b)", re.I) & costum_filters.user_command)
 async def incorrect_input(app: Client, message: Message):
     logger.loggers(message, text=f"маршрут = [Маршруток нет, есть автобус]")
-    mes = await message.reply("Забудьте про слово маршрутка, у Дніпрі всі маршрути автобусні.\n\nнапишіть:\nавтобус [номер автобуса]\n— автобус 151а\n— автобус 77\n— автобус 1")
+    mes = await message.reply("Забудьте про слово маршрутка, у м. Дніпро всі маршрути автобусні.\n\nнапишіть:\nавтобус [номер автобуса]\n— автобус 151а\n— автобус 77\n— автобус 1")
     messages = [mes]
     if message.text == message.matches[0].group():
         messages.append(message)
@@ -80,9 +80,9 @@ avtobus_wrong = r"(^|\b)(маршрутом|маршрут|маршрутка|а
 @Client.on_message(filters.regex(avtobus_wrong, re.I) & costum_filters.user_command)
 async def wrong_autobus_request(app, message):
     text = message.matches[0].group().lower().split()[-1]
-    logger.loggers(message, text=f"маршрут =  {text} не входить у маршрутну сітку міста Дніпро")
+    logger.loggers(message, text=f"маршрут =  {text} не входить до маршрутів міста Дніпро")
     mes = await app.send_message(message.chat.id,
-                                 'Даний маршрут не входить у маршрутну сітку міста Дніпро і, на жаль, ми не змогли отримати інформацію щодо його розкладу. Щоб дізнатись його розклад спробуйте зателефонувати на гарячу лінію ОДА за безкоштовним номером - 0800505600',
+                                 'Даний маршрут не входить до маршрутів міста Дніпро і, на жаль, ми не змогли отримати інформацію щодо його розкладу. Щоб дізнатись його розклад спробуйте зателефонувати на гарячу лінію ОДА за безкоштовним номером - 0800505600',
                                  reply_to_message_id=message.reply_to_message_id or message.id,
                                  disable_web_page_preview=True)
     messages = [mes]

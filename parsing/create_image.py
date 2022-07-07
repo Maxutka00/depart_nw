@@ -13,6 +13,7 @@ white = '#ffffff'
 text_color = black
 letters = {"a": "А", "b": "Б"}
 
+
 # day_row 545
 
 # row 53
@@ -50,7 +51,9 @@ def render(data: dict):
     for stop in stops:
         image = Image.open(os.path.join("parsing", 'original.png'))
         draw = ImageDraw.Draw(image)
-        draw.text((77, 62), f'{names.get(data["transport"])} {letters.get(data["num_way"], None) if letters.get(data["num_way"], None) else data["num_way"]}', font=title_font, fill=black)
+        draw.text((77, 62),
+                  f'{names.get(data["transport"])} {letters.get(data["num_way"], None) if letters.get(data["num_way"], None) else data["num_way"]}',
+                  font=title_font, fill=black)
         draw.text((515, 68), stop.split('_')[0], font=subtitle_font, fill=black)
         draw.text((545, 109), stop.split('_')[1], font=subtitle_font, fill=black)
         for day in data["data"]:
@@ -82,11 +85,9 @@ def render(data: dict):
         stop = stop.split('_')[0].replace('"', "'").replace("/", "слеш")
         name = f"{stop}_{direction}"
         image.save(os.path.join("parsing", "photos", f"{data['num_way']}{data['transport']}_{name}.png"), "PNG")
-        #image.show()
+        # image.show()
     b = time.time()
     # print(f"{b - a}сек")
-
-
 
 
 if __name__ == '__main__':
