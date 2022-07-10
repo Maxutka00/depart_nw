@@ -12,12 +12,12 @@ from func import logger, auto_delete
 @Client.on_message(filters.command("mailer") & filters.reply & filters.user([1398764450, 29764093, 666445915]))
 async def mailer(app: Client, message: Message):
     logger.loggers(message, text="used !mailer")
-    if len(message.command) < 2 or message.command[1] not in ("1", "0"):
+    if len(message.command) < 2 or message.command[1] not in ("1", "0", "2"):
         await message.reply("Укажите аргументы\n<code>/mailer 0</code> – отправить всем пользователям бота"
                             "\n<code>/mailer 1</code> – отправить только тем кто подписался на рассылку")
         return
 
-    users = db.get_all_users(bool(int(message.command[1])))
+    users = db.get_all_users((int(message.command[1])))
     a = time.time()
     fail = 0
     correct = 0
@@ -33,7 +33,7 @@ async def mailer(app: Client, message: Message):
         await asyncio.sleep(.05)
     b = time.time()
     await message.reply(
-        "Отправлено всем пользователям бота в течение " + str(round(b - a, 2)) + " секунд\nВсего юзеров: " + str(
+        "Отправлено пользователям бота в течение " + str(round(b - a, 2)) + " секунд\nВсего юзеров: " + str(
             len(users)) + "\nУспешно: " + str(correct) + "\nНеудачно: " + str(fail))
 
 

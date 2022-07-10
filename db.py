@@ -491,13 +491,17 @@ def get_warns(chat_id: int, user_id: int):
 
 ##################
 
-def get_all_users(only_mails: bool):
+def get_all_users(mode: int):
     with pymysql.connect(**connection_data.connection_data) as conn:
         with conn.cursor() as cursor:
-            if only_mails:
+            if mode == 1:
                 cursor.execute("""SELECT id FROM users WHERE mail = True""")
-            else:
+            elif mode == 0:
                 cursor.execute("""SELECT id FROM users""")
+            elif mode == 2:
+                cursor.execute("""SELECT id FROM users WHERE mail != True""")
+            else:
+                raise Exception("Wrong mode")
             users = cursor.fetchall()
             data = []
             for each in users:
