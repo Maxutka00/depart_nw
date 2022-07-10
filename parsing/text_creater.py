@@ -21,6 +21,7 @@ def get_text(num: str, transport_type):
                 num = num.replace(symbol, '')
         similar = db.get_similar_transport(num)
         if similar:
+            similar = similar[:10]
             txt = "Даного маршруту не існує у місті Дніпро, скоріше за все ви мали на увазі один из маршрутів:\n{}".format("\n".join([f"<code>маршрут {i}</code>" for i in similar]))
         elif int(num) < 177:
             txt = "Ви помилились, цей маршрут відсутній серед маршрутів міста.\nНапишіть правильний номер маршруту, будь ласка."

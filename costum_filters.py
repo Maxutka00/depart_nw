@@ -1,6 +1,7 @@
 import json
 import os
 import time
+from datetime import timedelta, datetime
 from typing import Union, Optional
 
 from pyrogram.enums.message_entity_type import MessageEntityType
@@ -168,7 +169,8 @@ def get_data(chat_id: int, user_id: int):
 
 async def parse_filter(_, client, message: types.Message):
     if global_vars.status.get_parsing_status():
-        mes = await message.reply("Зараз бот оновлює дані, щоб вони були актуальні. Спробуйте ще раз через 2-3 хвилини, дякуємо!")
+        mes = await message.reply(
+            "Зараз бот оновлює дані, щоб вони були актуальні. Спробуйте ще раз через 2-3 хвилини, дякуємо!")
         await auto_delete.delete_command([mes], 15)
         return False
     else:
@@ -185,4 +187,17 @@ async def group_filter(_, client, message: types.Message):
     else:
         return True
 
+
 group = filters.create(group_filter)
+
+
+async def recent_edit_filter(_, client, message: types.Message):
+    if message.chat.type not in (ChatType.GROUP, ChatType.SUPERGROUP):
+        return False
+    if message.edit_date is None:
+        return False
+    if message.date + timedelta(minutes=3) < datetime.now():
+        return False
+    return True
+
+recent_edit = filters.create(recent_edit_filter)

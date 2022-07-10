@@ -23,21 +23,18 @@ async def message_deleter(message, time: int = 180):
         pass
 
 
-
-
-
 avtobus_nn = r"(^|\b)((автобус|маршрут) +\d+[абг]?)|(\d+[абг]? +(автобус|маршрут))(^|\b)"
 
 
+@Client.on_edited_message(costum_filters.recent_edit & filters.regex(avtobus_nn, re.I) & costum_filters.user_command)
 @Client.on_message(filters.regex(avtobus_nn, re.I) & costum_filters.user_command)
 async def autobus_request(app: Client, message: Message):
-    
     for match in message.matches:
         logger.loggers(message, text=f"маршрут = {match.group()}")
         num = None
         for index, element in enumerate(match.group().split()):
             if element.lower() in ("автобус", "маршрут"):
-                num = match.group().split()[index-1]
+                num = match.group().split()[index - 1]
         mes = await app.send_message(message.chat.id, get_text(num, 'Автобус'),
                                      reply_to_message_id=message.reply_to_message_id or message.id,
                                      disable_web_page_preview=True, parse_mode=ParseMode.HTML)
@@ -67,7 +64,8 @@ async def incorrect_input(app: Client, message: Message):
 @Client.on_message(filters.regex(r"(^|\b)(маршрутк\w*) +\d+[АБГ]?(^|\b)", re.I) & costum_filters.user_command)
 async def incorrect_input(app: Client, message: Message):
     logger.loggers(message, text=f"маршрут = [Маршруток нет, есть автобус]")
-    mes = await message.reply("Забудьте про слово маршрутка, у м. Дніпро всі маршрути автобусні.\n\nнапишіть:\nавтобус [номер автобуса]\n— автобус 151а\n— автобус 77\n— автобус 1")
+    mes = await message.reply(
+        "Забудьте про слово маршрутка, у м. Дніпро всі маршрути автобусні.\n\nнапишіть:\nавтобус [номер автобуса]\n— автобус 151а\n— автобус 77\n— автобус 1")
     messages = [mes]
     if message.text == message.matches[0].group():
         messages.append(message)
