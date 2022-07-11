@@ -26,7 +26,6 @@ async def message_deleter(message, time: int = 180):
 avtobus_nn = r"(^|\b)((автобус|маршрут) +\d+[абг]?)|(\d+[абг]? +(автобус|маршрут))(^|\b)"
 
 
-@Client.on_edited_message(costum_filters.recent_edit & filters.regex(avtobus_nn, re.I) & costum_filters.user_command)
 @Client.on_message(filters.regex(avtobus_nn, re.I) & costum_filters.user_command)
 async def autobus_request(app: Client, message: Message):
     for match in message.matches:
