@@ -191,13 +191,3 @@ async def group_filter(_, client, message: types.Message):
 group = filters.create(group_filter)
 
 
-async def recent_edit_filter(_, client, message: types.Message):
-    if message.chat.type not in (ChatType.GROUP, ChatType.SUPERGROUP):
-        return False
-    if message.edit_date is None:
-        return False
-    if message.date + timedelta(minutes=3) < datetime.now():
-        return False
-    return True
-
-recent_edit = filters.create(recent_edit_filter)
