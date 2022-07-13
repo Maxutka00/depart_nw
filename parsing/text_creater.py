@@ -55,7 +55,7 @@ def get_text(num: str, transport_type):
             for i in range(len(intervals)):
                 if intervals[i] == "-":
                     continue
-                interval = 'не известно' if intervals[i] == '' else intervals[0]
+                interval = 'не известно' if intervals[i] == '' else intervals[i]
                 text.append(f"{interval_time[i]} - <b>{interval}хв</b>")
         if data[4] and all_data.index(data) != len(all_data) - 1:
             text.append("———————————")
