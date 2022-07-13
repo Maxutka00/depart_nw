@@ -23,7 +23,7 @@ async def message_deleter(message, time: int = 180):
         pass
 
 
-avtobus_nn = r"(^|\b)((автобус|маршрут) +\d+[абг]?)|(\d+[абг]? +(автобус|маршрут))(^|\b)"
+avtobus_nn = r"(^|\b)((автобус|маршрут) +\d+ ?[абг]?)|(\d+ ?[абг]? +(автобус|маршрут))(^|\b)"
 
 
 @Client.on_message(filters.regex(avtobus_nn, re.I) & costum_filters.user_command)
@@ -31,16 +31,16 @@ async def autobus_request(app: Client, message: Message):
     for match in message.matches:
         logger.loggers(message, text=f"маршрут = {match.group()}")
         num = None
-        for index, element in enumerate(match.group().split()):
+        for index, element in enumerate(match.group().strip().split()):
             if element.lower() in ("автобус", "маршрут"):
-                num = match.group().split()[index - 1]
+                num = match.group().strip().split()[index - 1]
         mes = await app.send_message(message.chat.id, get_text(num, 'Автобус'),
                                      reply_to_message_id=message.reply_to_message_id or message.id,
                                      disable_web_page_preview=True, parse_mode=ParseMode.HTML)
         if num.lower() in db.get_all_nums():
             logger.log_transport("bus", num.lower(), message.from_user.id)
         messages = [mes]
-        if message.text == match.group():
+        if message.text == match.group().strip():
             messages.append(message)
         await auto_delete.delete_timetable(messages)
 
