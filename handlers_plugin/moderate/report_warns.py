@@ -3,9 +3,11 @@ import re
 from datetime import datetime, timedelta
 
 from pyrogram import Client, filters
+from pyrogram.enums import ChatType
 from pyrogram.errors import UserAdminInvalid, ChatAdminRequired, ChannelInvalid
 from pyrogram.types import Message, ChatPermissions, CallbackQuery
 
+import config
 import costum_filters
 import db
 from func import auto_delete
@@ -119,27 +121,39 @@ async def err_report(app: Client, message: Message):
 
 
 @Client.on_message(
-    filters.command(["info"], prefixes=["/", "!"]) & costum_filters.group & costum_filters.chat_admin_filter)
+    filters.command(["info"], prefixes=["/", "!"]))
 async def info(app: Client, message: Message):
     logger.loggers(message, text="использован !info")
-    if message.reply_to_message:
-        user = message.reply_to_message.from_user.id
+    chat = None
+    if message.reply_to_message and message.chat.type in (ChatType.GROUP, ChatType.SUPERGROUP):
+        user = message.reply_to_message.from_user
+        if message.from_user.id not in config.admins:
+            chat = message.chat.id
+        else:
+            chat = message.chat.id
     elif len(message.text.split()) > 1:
+        if message.from_user.id not in config.admins:
+            chat = message.chat.id
         user = await app.get_users(message.text.split()[1])
     else:
-        mes = await message.reply("Вы не ответили на сообщение юзера/не написали его id")
-        await auto_delete.delete_command([mes, message])
-        return
+        user = message.from_user
 
-    warns = db.get_warns(message.chat.id, user.id)
+    warns = db.get_warns(user.id, chat)
     text = f"Юзер: {user.mention}\nID: <code>{user.id}</code>"
     text_warns = []
     if not warns:
         text_warns = ["Варнов нет"]
-    for num, warn in enumerate(warns, start=1):
-        text_warns.append(f"{num}. {warn}")
+    for chat_id in warns:
+        chat = await app.get_chat(chat_id)
+        chat = ("@" + chat.username) if chat.username else chat.title
+        chat_warns = warns.get(chat_id)
+        txt = [f"Чат: {chat}"]
+        for num, warn in enumerate(chat_warns):
+            txt.append(f"\t{num}. {warn}")
+        text_warns.append("\n".join(txt))
+
     text_warns = '\n'.join(text_warns)
-    mes = await message.reply(f"{text}\n\nВарны:\n{text_warns}")
+    mes = await message.reply(f"{text}\n\nВарны:\n{text_warns}\n")
     await auto_delete.delete_command([mes, message])
 
 

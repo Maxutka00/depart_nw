@@ -224,9 +224,12 @@ def electric_transport_parse():
                 print(r, w - q, 'сек')
     except Exception as e:
         for tech_admin in config.admins:
-            a = requests.post(
+            try:
+                a = requests.post(
                 f"https://api.telegram.org/bot{config.TOKEN}/sendMessage?chat_id={tech_admin}&text=Ошибка при парсинге {link}\n\n{traceback.format_exc()}")
-            print(a)
+                print(a)
+            except Exception as e:
+                print(e)
         global_vars.status.set_parsing_status(False)
         raise e
     global_vars.status.set_parsing_status(False)
