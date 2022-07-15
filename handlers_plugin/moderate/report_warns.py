@@ -148,7 +148,7 @@ async def info(app: Client, message: Message):
         chat = ("@" + chat.username) if chat.username else chat.title
         chat_warns = warns.get(chat_id)
         txt = [f"Чат: {chat}"]
-        for num, warn in enumerate(chat_warns):
+        for num, warn in enumerate(chat_warns, start=1):
             txt.append(f"\t{num}. {warn}")
         text_warns.append("\n".join(txt))
 
