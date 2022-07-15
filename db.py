@@ -472,21 +472,28 @@ def del_warn(chat_id: int, user_id: int, num: int):
             return True
 
 
-def get_warns(chat_id: int, user_id: int):
+def get_warns(user_id: int, chat_id: int,):
     with pymysql.connect(**connection_data.connection_data) as conn:
         with conn.cursor() as cursor:
-            cursor.execute("""SELECT warns FROM warns WHERE chat_id = %s and user_id = %s""",
+            if chat_id is not None:
+                cursor.execute("""SELECT chat_id, warns FROM warns WHERE chat_id = %s and user_id = %s""",
                            (chat_id, user_id))
-            warns = cursor.fetchone()
-            if warns is None:
+            else:
+                cursor.execute("""SELECT chat_id, warns FROM warns WHERE user_id = %s""",
+                               (user_id,))
+            warns = cursor.fetchall()
+            if warns is None and chat_id is not None:
                 cursor.execute("""INSERT INTO warns VALUES (%s, %s, %s)""", (chat_id, user_id, ''))
                 conn.commit()
-                return []
-            elif warns[0] == '':
-                return []
-            else:
-                warns = warns[0].split(';;')
-                return warns
+                return {}
+            elif warns is None:
+                return {}
+            d_warns = {}
+            for i in warns:
+                if i[1] == "":
+                    continue
+                d_warns.update({i[0]: i[1].split(';;')})
+            return d_warns
 
 
 ##################
