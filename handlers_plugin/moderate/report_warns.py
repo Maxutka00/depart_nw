@@ -82,11 +82,11 @@ async def warn(app: Client, message: Message):
         reason = message.text.split(maxsplit=1)[1]
         num_warn = db.add_warn(message.chat.id, message.reply_to_message.from_user.id, reason)
         if num_warn == 1:
-            hours = 3
+            hours = 6
         elif num_warn == 2:
-            hours = 24
+            hours = 24 * 3
         else:
-            hours = 24 * 2
+            hours = 24 * 9
 
         try:
             await app.restrict_chat_member(message.chat.id, message.reply_to_message.from_user.id, ChatPermissions(),
