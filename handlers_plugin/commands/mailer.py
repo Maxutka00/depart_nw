@@ -12,9 +12,8 @@ from func import logger, auto_delete
 @Client.on_message(filters.command("mailer") & filters.reply & filters.user([1398764450, 29764093, 666445915]))
 async def mailer(app: Client, message: Message):
     logger.loggers(message, text="used !mailer")
-    if len(message.command) < 2 or message.command[1] not in ("1", "0", "2"):
-        await message.reply("Укажите аргументы\n<code>/mailer 0</code> – отправить всем пользователям бота"
-                            "\n<code>/mailer 1</code> – отправить только тем кто подписался на рассылку")
+    if len(message.command) < 2 or message.command[1] not in ("1", "0", "2") or (len(message.command) >= 3 and message.command[2] not in ("1", "0", "2")):
+        await message.reply("Укажите аргументы\n/mailer [2 - без подписки, 1 - c подпиской, 0 - всем] [0 - оффициал канал, 1 - Оффициал Предствитель, 2 - Пустуо]")
         return
 
     users = db.get_all_users((int(message.command[1])))

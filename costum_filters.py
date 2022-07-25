@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import time
 from datetime import timedelta, datetime
 from typing import Union, Optional
@@ -72,8 +73,12 @@ async def words_blacklist(_, client, message: types.Message):
     blacklist = db.get_chat_blacklist(message.chat.id)
     if not blacklist:
         return False
+    for i in range(0, len(blacklist)):
+        if blacklist[i] == "" or blacklist[i] == " ":
+            blacklist.pop(i)
     for word in blacklist:
-        if word.lower() in text:
+        if re.search(rf"(\W|\b){word}(\W|\b)", text, flags=re.I):
+            print(re.search(rf"(\W|\b){word}(\W|\b)", text, re.I))
             return True
     return False
 

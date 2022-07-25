@@ -20,10 +20,7 @@ letters = {"a": "А", "b": "Б"}
 # col 41
 
 def render(data: dict):
-    files = os.listdir(os.path.join("parsing", "photos"))
-    files = list(filter(lambda x: x.startswith(f"{data['num_way']}{data['transport']}"), files))
-    for file in files:
-        os.remove(os.path.join("parsing", "photos", file))
+
     a = time.time()
     font = ImageFont.truetype(os.path.join('parsing', 'fonts', 'ClearSans-Regular.ttf'), size=25)
     subtitle_font = ImageFont.truetype(os.path.join('parsing', 'fonts', 'ClearSans-Medium.ttf'), size=30)
@@ -84,7 +81,16 @@ def render(data: dict):
             "\\", "bsl")
         stop = stop.split('_')[0].replace('"', "'").replace("/", "слеш")
         name = f"{stop}_{direction}"
+        if os.path.exists(os.path.join("parsing", "photos", f"{data['num_way']}{data['transport']}_{name}.png")):
+            im = Image.open(os.path.join("parsing", "photos", f"{data['num_way']}{data['transport']}_{name}.png"))
+            if im.histogram() == image.histogram():
+                pass
+            else:
+                im.close()
+                os.remove(os.path.join("parsing", "photos", f"{data['num_way']}{data['transport']}_{name}.png"))
+            im.close()
         image.save(os.path.join("parsing", "photos", f"{data['num_way']}{data['transport']}_{name}.png"), "PNG")
+        image.close()
         # image.show()
     b = time.time()
     # print(f"{b - a}сек")

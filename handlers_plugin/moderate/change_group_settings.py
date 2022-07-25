@@ -314,7 +314,7 @@ async def help_message(app: Client, message: Message):
                 "<code>!add_admin [юзернеймы разделяя ;]</code> - добовляет юзера в администрацию чата(открывает доступ к командам выше)")
     if message.from_user.id in config.admins:
         text.append("\n<b>Команды для тех персонала:</b>")
-        text.append("<code>/mailer [2 - без подписки, 1 - c подпиской, 0 - всем]</code>\n<code>/repair</code>\n<code>/parse</code>\n<code>/stop</code> - остановка бота\n<code>/send_log</code>\n<code>/stats</code> - статистика использований")
+        text.append("<code>/mailer [2 - без подписки, 1 - c подпиской, 0 - всем] [0 - оффициал канал, 1 - Оффициал Предствитель, 2 - Пустуо]</code>\n<code>/repair</code>\n<code>/parse</code>\n<code>/stop</code> - остановка бота\n<code>/send_log</code>\n<code>/stats</code> - статистика использований")
     if inline.donate_kb():
         text.append("\nВи можете підтримати ЗСУ за кнопкою нижче")
     await app.send_message(message.from_user.id, '\n'.join(text), reply_markup=inline.donate_kb())

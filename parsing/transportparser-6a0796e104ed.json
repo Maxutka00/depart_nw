@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "transportparser",
+  "private_key_id": "6a0796e104ed949b8ca59fc361524feed2b61882",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCqCxdYpcZspkUo\nRtLD7PDZbWdTWkFpZoFlAk7IcKZGJ9HUt/+Su1odbLiZbR2a49NLs7Tu2Z0XyihS\nSBlb7KpmkN5yxjOW4Ssu1RxBIBpnSiusggUKEP3rO9Dxjo4NI+xFhI3lannBWf4W\n/wE9SYHLMGSkNXL61rsvdT4umXFEaboI1ivJzvLK7bLzxVJkD8fCbL5mJCUEHTDj\nRUrMb5wOfx2bQzLqwjtfeg6kwKgozutNOYyGOj4OY750esc3YUeGIsrQxFUDk0NB\nAARHJ2/1RjzFsYn8zy84N7i6d1Vvesvb5OtdY0YIQwBnZ6x5rS79bb5QCrxXvxNt\nKJSqGMKVAgMBAAECggEAGi5+f/74XBLGy7KJ8bJaDDRI6D/Zmfu3OSD/leOoal1n\ntL/G6WYQ9D5g9viiyg5BoqKPHYaipj7RcgfZZbq9KvEr2xKy70yIrFuST+G8RwKX\n0mYrlfbzTcSmQYcwTowlLTgBbB02lYOAeLR3UaMviaRQHqt/ImmtJRvBgQXNt5lq\nPUqAkiCk8Smf0U4Rf6SHyO6NxMiR2MSOjsBWMDiWVdwdIMXOnt/GNKskD0YR7CmY\nWZAncQh2okVbV4aIecHe19pfQIR+31nPZOEjW5xBYs//6FI91Sqso7xltTNMipnl\nsjyLGzRRLLz9JlsIIDOVUjLiGiaAqEae1dfr5zHlsQKBgQDnOhIzEAbjdmZZ2kIX\nGoV9lbwUtqQQdfDCPwuSyqhEALwNYPQbPkL99OBDuRIP2oMVTRRQPpq8mu22b8k2\nLfXTQrd/zbC2s4aWti6ZmcQUeWzorR41pBK5NgXnAx1490bee38YzmSuJovm96za\nKPRlhmFZNPwjV4WlZGepg+fIEQKBgQC8QuvUvEMjud3XJrHy24lAXSAEsoeeP2Ck\nKfVjB4l3NYylQk70pXDIkJBs6KWkCjDN2/STfW2s2k3S3ySoDw/kYR8kmuBwDGi4\n1EAA/KPxSmF7gzHMPxmPbM3EwzEzNHk0XTbPWW889h1eJEgk8fD/3QRbl1dC9WWn\nITj5h+h2RQKBgAbpZnfeR8Zu2Jpg+s7D/S+G1UttNjRDwkGcLtVhd2wo9XYU6tcR\nomEC+90qYA7XQknVtwC7DlcK7oYgi0wyTYHWIbQRSvH7Jc/FfFkdDo5qHsZJvnhu\nAh1FLyH7ptrh0V1/JYpxSPMntdDeoG0ZAk0ymiBXhB3uVNFf0fVwOvJxAoGAMmoB\nWVCo8hI98/WqxYxArvnBL0DXzGrQaGXMDp7gEwpGBaNCHYWINE1yP5f1c34/H4F9\nd1mpWxaCrKuQ12hhKxlPC7Bl1duc15IPKbR9+omenUK+vSFQqPXMDJrwu/ObWYh0\nuwYKIdsOdj1lDG+1x+7Z0eUvOwEYHa9p4HiiqbkCgYEAmUF6htGmP8TA182wGVHg\n26zlp0m2AAYXKkl2ilUoCqAOieO4Cqb5MR2kN8lbHIIesQbQta/kKtI8H0rRIsGS\nixCKA+QKKa0nf8nSJg7mLnUQdSudIFllrrBF78of8wCgmWaOyS1BYX1PfMgk3mkY\nikpQkPOvw1AaXyeY2jcYTvo=\n-----END PRIVATE KEY-----\n",
+  "client_email": "transport-table-parser@transportparser.iam.gserviceaccount.com",
+  "client_id": "116152463380480408316",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/transport-table-parser%40transportparser.iam.gserviceaccount.com"
+}
