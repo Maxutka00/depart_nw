@@ -34,7 +34,7 @@ def get_service_sacc():
     transport-table-parsing@transportparser.iam.gserviceaccount.com
     """
     # https://t1p.de/9y1xc
-    creds_json = os.path.join('parsing', 'transportparser-daec56150554.json')
+    creds_json = os.path.join('parsing', 'transportparser-6a0796e104ed.json')
     # creds_json = 'transportparser-daec56150554.json'
     scopes = ['https://www.googleapis.com/auth/spreadsheets']
 
