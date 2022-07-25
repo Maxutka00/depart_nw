@@ -31,7 +31,6 @@ def get_service_simple():
 def get_service_sacc():
     """
     Используется сервисный аккаунт:
-    transport-table-parsing@transportparser.iam.gserviceaccount.com
     """
     # https://t1p.de/9y1xc
     creds_json = os.path.join('parsing', 'transportparser-6a0796e104ed.json')
