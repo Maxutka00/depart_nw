@@ -21,7 +21,7 @@ from parsing import create_image
 first_bas_row = 10
 
 first_electric_transport_row = 2
-last_crop_electric_transport_row = -4
+last_crop_electric_transport_row = -3
 
 
 def get_service_simple():
@@ -138,18 +138,9 @@ def electric_transport_parse():
                     css = soup.find("style", type="text/css").text
                     css = cssutils.parseString(css).cssRules
                     active = []
-                    stop_classes = []
-                    border_classes = ["s0"]
+                    stop_classes = ["s1"]
                     for i in css:
-                        if (i.style.textAlign == 'center' and i.style.fontFamily.replace(' ',
-                                                                                         '') == '"docs-Calibri",Arial' and
-                                i.style.fontWeight == "bold"):
-                            if i.style.fontSize.replace("pt", "").isdigit() and int(
-                                    i.style.fontSize.replace("pt", "")) >= 5:
-                                stop_classes.append(i.selectorText.replace('.', '').split()[-1])
-
-
-                        elif i.style.color == '#000':
+                        if i.style.color == '#000':
                             active.append(i.selectorText.replace('.', '').split()[-1])
                             continue
                     table = soup.find("table", class_="waffle")
@@ -177,27 +168,26 @@ def electric_transport_parse():
                             skip = False
                             continue
                         cols = row.find_all('td')
-                        cols = cols[1:len(cols) - 1] if len(cols) in (3,) else cols
                         find = None
-                        for class_ in stop_classes:
-                            find = row.find("td", class_=class_)
-                            if find:
-                                break
-                        if find and find.text:
-                            skip = True
-                            stop = find or cols[0]
-                            direction = re.search(r'(?<=(\(напрямок до)).+(?=\))', stop.text)
-                            if direction:
-                                direction = direction.group().strip()
+                        if len(cols) == 1:
+                            for class_ in stop_classes:
+                                find = row.find("td", class_=class_)
+                                if find:
+                                    break
+                            if find and find.text:
+                                skip = True
+                                stop = find or cols[0]
+                                direction = re.search(r'(?<=(\(напрямок до)).+(?=\))', stop.text)
+                                if direction:
+                                    direction = direction.group().strip()
+                                else:
+                                    direction = ''
+                                stop = stop.text.split('(')[0].strip()
+                                data['data'][day]['stops'][f"{stop}_{direction}"] = {}
+                                continue
                             else:
-                                direction = ''
-                            stop = stop.text.split('(')[0].strip()
-                            data['data'][day]['stops'][f"{stop}_{direction}"] = {}
-                            continue
-                        elif len(cols) <= 3:
-                            continue
+                                continue
                         if stop is None:
-                            print(link_to_table)
                             raise Exception
                         element_index = 0
                         for col in cols:
@@ -205,8 +195,6 @@ def electric_transport_parse():
                             class_ = col["class"][0].split()[0]
                             if len(col['class']) > 1 and col['class'][1] == 'softmerge':
                                 minute = col.find('div').text
-                            if class_ in border_classes and col.text == '':
-                                continue
                             elif class_ not in active or col.text == '':
                                 minute = None
                             minutes = data['data'][day]['stops'][f"{stop}_{direction}"].get('time', {})
@@ -226,7 +214,7 @@ def electric_transport_parse():
         for tech_admin in config.admins:
             try:
                 a = requests.post(
-                f"https://api.telegram.org/bot{config.TOKEN}/sendMessage?chat_id={tech_admin}&text=Ошибка при парсинге {link}\n\n{traceback.format_exc()}")
+                 f"https://api.telegram.org/bot{config.TOKEN}/sendMessage?chat_id={tech_admin}&text=Ошибка при парсинге {link}\n\n{traceback.format_exc()}")
                 print(a)
             except Exception as e:
                 print(e)

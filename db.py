@@ -59,7 +59,8 @@ def prepare_db():
             user_id BIGINT,
             warns TEXT); /*warn1;;warn2;;warn3*/""")
             cursor.execute("""CREATE TABLE IF NOT EXISTS users(id BIGINT PRIMARY KEY,
-            mail BOOL);""")
+            mail BOOL,
+            block BOOL);""")
             cursor.execute("""CREATE TABLE IF NOT EXISTS buses(
             num_route TINYTEXT, /* номер маршрута, если есть буква, то в нижнем регистре*/
             way_place TEXT, /*шлях прямування, также как и в таблице*/
@@ -127,9 +128,11 @@ def add_user(user_id: int, ):
             cursor.execute("SELECT * FROM users WHERE id=%s", (user_id,))
             user = cursor.fetchone()
             if user is None:
-                cursor.execute("INSERT INTO users Values (%s, %s)", (user_id, False))
+                cursor.execute("INSERT INTO users Values (%s, %s, %s)", (user_id, False, False))
                 conn.commit()
                 return True
+            elif user[2] == 1:
+                cursor.execute("UPDATE users SET blocked = False WHERE id = ?", (user_id,))
             else:
                 return False
 

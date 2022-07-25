@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import sys
 
 from pyrogram import Client
 from loguru import logger
@@ -78,6 +79,7 @@ bus_parse_scheduler.start()
 electric_transport_scheduler.add_job(electric_transport_parse, "cron", hour=4, minute=0)
 electric_transport_scheduler.add_job(electric_transport_parse, "cron", hour=13, minute=0)
 electric_transport_scheduler.start()
-db.add_transport(transport_parse())
+if len(sys.argv) > 1 and sys.argv[1] == "p":
+    db.add_transport(transport_parse())
 logger.info('Starting a telegram bot')
 app.run()
