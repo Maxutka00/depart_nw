@@ -2,7 +2,7 @@ from loguru import logger
 from pyrogram import filters, enums
 from pyrogram import Client
 from pyrogram.enums import ChatType
-from pyrogram.types import Message
+from pyrogram.types import Message, CallbackQuery
 
 import config
 import db
@@ -45,10 +45,14 @@ async def start(app, message: Message):
             async for m in app.get_chat_members(message.chat.id, filter=enums.ChatMembersFilter.ADMINISTRATORS):
                 administrators.append(m.user.id)
             db.add_chat(message.chat.id, administrators)
-    if inline.donate_kb():
-        mes_text += "\n\nВи можете надати гроші для сплати за сервер для роботи бота та підтримки адміністрації бота\n\n🔗Посилання на Банку\nhttps://send.monobank.ua/jar/6E85edaBFL\n\n💳Номер карти Банки\n<code>5375 4112 0229 7482</code>"
-
+    mes_text += "\n\nКнопкой ниже вы можете получить реквизиты для поддержки бота."
     mes = await app.send_message(message.chat.id, mes_text, reply_markup=inline.donate_kb())
     if ref:
         await message.reply(config.ref_links.get(ref))
     await auto_delete.delete_command([message, mes])
+
+
+@Client.on_callback_query(filters.regex("donate"))
+async def donate(app: Client, callback_query: CallbackQuery):
+    await callback_query.message.edit_reply_markup()
+    await callback_query.message.reply("Ви можете надати гроші для сплати за сервер для роботи бота та підтримки адміністрації бота\n\n🔗Посилання на Банку\nhttps://send.monobank.ua/jar/6E85edaBFL\n\n💳Номер карти Банки\n<code>5375 4112 0229 7482</code>")
