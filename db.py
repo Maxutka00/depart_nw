@@ -60,7 +60,8 @@ def prepare_db():
             warns TEXT); /*warn1;;warn2;;warn3*/""")
             cursor.execute("""CREATE TABLE IF NOT EXISTS users(id BIGINT PRIMARY KEY,
             mail BOOL,
-            block BOOL);""")
+            block BOOL,
+            ref INT);""")
             cursor.execute("""CREATE TABLE IF NOT EXISTS buses(
             num_route TINYTEXT, /* номер маршрута, если есть буква, то в нижнем регистре*/
             way_place TEXT, /*шлях прямування, также как и в таблице*/
@@ -122,13 +123,13 @@ def get_all_nums() -> List:
             return nums
 
 
-def add_user(user_id: int, ):
+def add_user(user_id: int, ref: Optional[int]):
     with pymysql.connect(**connection_data.connection_data) as conn:
         with conn.cursor() as cursor:
             cursor.execute("SELECT * FROM users WHERE id=%s", (user_id,))
             user = cursor.fetchone()
             if user is None:
-                cursor.execute("INSERT INTO users Values (%s, %s, %s)", (user_id, False, False))
+                cursor.execute("INSERT INTO users Values (%s, %s, %s, %s)", (user_id, False, False, ref))
                 conn.commit()
                 return True
             elif user[2] == 1:
@@ -531,3 +532,10 @@ def get_user_mail(user_id: int):
         with conn.cursor() as cursor:
             cursor.execute("""SELECT mail FROM users WHERE id = %s""", (user_id,))
             return bool(cursor.fetchone()[0])
+
+
+def get_ref_users(ref_id: int):
+    with pymysql.connect(**connection_data.connection_data) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("""SELECT id FROM users WHERE ref = %s""", (ref_id,))
+            return cursor.fetchall()
