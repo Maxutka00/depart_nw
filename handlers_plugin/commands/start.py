@@ -46,7 +46,7 @@ async def start(app, message: Message):
                 administrators.append(m.user.id)
             db.add_chat(message.chat.id, administrators)
     if inline.donate_kb():
-        mes_text += "\n\nКнопкой ниже вы можете получить реквизиты для поддержки бота."
+        mes_text += "\n\nВи можете надати гроші для сплати за сервер для роботи бота та підтримки адміністрації бота\n\n🔗Посилання на Банку\nhttps://send.monobank.ua/jar/6E85edaBFL\n\n💳Номер карти Банки\n<code>5375 4112 0229 7482</code>"
 
     mes = await app.send_message(message.chat.id, mes_text, reply_markup=inline.donate_kb())
     if ref:

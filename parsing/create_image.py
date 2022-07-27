@@ -21,7 +21,6 @@ letters = {"a": "А", "b": "Б"}
 
 def render(data: dict):
 
-    a = time.time()
     font = ImageFont.truetype(os.path.join('parsing', 'fonts', 'Arial-BoldMT.ttf'), size=40)
     subtitle_font = ImageFont.truetype(os.path.join('parsing', 'fonts', 'Arial-BoldMT.ttf'), size=40)
     title_font = ImageFont.truetype(os.path.join('parsing', 'fonts', 'Arial-BoldMT.ttf'), size=60)
@@ -51,9 +50,9 @@ def render(data: dict):
         text_image.save(os.path.join("parsing", "photos", f"{data['num_way']}{data['transport']}.png"), 'PNG')
         return
     for stop in stops:
-        image = Image.open(os.path.join("parsing", 'original2.jpg'))
+        image = Image.open(os.path.join("parsing", 'original.jpg'))
         draw = ImageDraw.Draw(image)
-        draw.text((77, 62),
+        draw.text((1000, 200),
                   f'{names.get(data["transport"])} {letters.get(data["num_way"], None) if letters.get(data["num_way"], None) else data["num_way"]}',
                   font=title_font, fill=black)
         draw.text((380, 366), stop.split('_')[0], font=subtitle_font, fill=text_color)
@@ -77,8 +76,8 @@ def render(data: dict):
             if day != stops.get(stop) and stops.get(stop) != -1:
                 continue
             for row_num, minutes in enumerate(data['data'][day]['stops'][stop]['time'].values()):
-                if len(minutes) > 8:
-                    draw.text((139 + 545 * day, 257 + row_num * 41.39), "кожні 5 хвилин", font=font, fill=text_color)
+                if len(minutes) > 5:
+                    draw.text((298 + 985 * day, 631 + row_num * 58), "кожні 5 хвилин", font=font, fill=text_color)
                     continue
                 for num, minute in enumerate(minutes):
                     draw.text((298 + 985 * day + 65 * num, 631 + row_num * 58), minute, font=font, fill=text_color)

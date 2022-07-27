@@ -31,7 +31,7 @@ def del_mute_kb(user_id: int) -> InlineKeyboardMarkup:
 def donate_kb() -> Optional[InlineKeyboardMarkup]:
     if config.donate_link == "":
         return None
-    kb = [[InlineKeyboardButton("Пожервовать", url=config.donate_link)]]
+    kb = [[InlineKeyboardButton("Підтримати", url=config.donate_link)]]
     return InlineKeyboardMarkup(kb)
 
 
