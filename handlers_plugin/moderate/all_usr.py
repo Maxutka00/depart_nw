@@ -9,7 +9,9 @@ from pyrogram import filters
 
 @Client.on_message(filters.private, group=5)
 async def all_usr(app, message: Message):
-    db.add_user(message.from_user.id)
+    if message.text.startswith("/start"):
+        return
+    db.add_user(message.from_user.id, None)
 
 
 @Client.on_message(filters.group, group=5)

@@ -24,7 +24,7 @@ async def message_deleter(message, time: int = 180):
 
 
 @Client.on_message(
-    filters.command("report", prefixes=["/", "!"]) & costum_filters.group & filters.reply & costum_filters.user_command)
+    filters.command("report", prefixes=["/", config.prefix]) & costum_filters.group & filters.reply & costum_filters.user_command)
 async def report(app: Client, message: Message):
     await message.delete()
     report_chat = db.get_report_chat(message.chat.id)
@@ -43,7 +43,7 @@ async def report(app: Client, message: Message):
     await auto_delete.delete_command(messages)
 
 
-@Client.on_message(filters.command("report", prefixes=["/", "!"]) & costum_filters.group & ~filters.reply)
+@Client.on_message(filters.command("report", prefixes=["/", config.prefix]) & costum_filters.group & ~filters.reply)
 async def err_report(app: Client, message: Message):
     mes = await message.reply("Вы не ответили на сообщение")
     messages = [mes, message]
@@ -51,7 +51,7 @@ async def err_report(app: Client, message: Message):
 
 
 @Client.on_message(filters.command(["warn", "w"], prefixes=["/",
-                                                            "!"]) & costum_filters.group & filters.reply & costum_filters.chat_admin_filter)
+                                                            config.prefix]) & costum_filters.group & filters.reply & costum_filters.chat_admin_filter)
 async def warn(app: Client, message: Message):
     if message.sender_chat:
         logger.loggers(message, text="used !warn [Невозможно выдать варн, человек пишет не от своего имени]")
@@ -113,7 +113,7 @@ async def warn(app: Client, message: Message):
     await auto_delete.delete_command([mes, message, mes1])
 
 
-@Client.on_message(filters.command(commands=["warn", "w"], prefixes=["/", "!"]) & costum_filters.group & ~filters.reply)
+@Client.on_message(filters.command(commands=["warn", "w"], prefixes=["/", config.prefix]) & costum_filters.group & ~filters.reply)
 async def err_report(app: Client, message: Message):
     mes = await message.reply("Вы не ответили на сообщение")
     messages = [mes, message]
@@ -121,7 +121,7 @@ async def err_report(app: Client, message: Message):
 
 
 @Client.on_message(
-    filters.command(["info"], prefixes=["/", "!"]))
+    filters.command(["info"], prefixes=["/", config.prefix]))
 async def info(app: Client, message: Message):
     logger.loggers(message, text="использован !info")
     chat = None

@@ -322,7 +322,7 @@ async def help_message(app: Client, message: Message):
     return
 
 
-@Client.on_message(filters.command("add_admin", prefixes="!") & costum_filters.chat_admin_filter & costum_filters.admin_command)
+@Client.on_message(filters.command("add_admin", prefixes=config.prefix) & costum_filters.chat_admin_filter & costum_filters.admin_command)
 async def add_admin_func(app: Client, message: Message):
     if len(message.command) > 1:
         args = message.text.split(maxsplit=1)
