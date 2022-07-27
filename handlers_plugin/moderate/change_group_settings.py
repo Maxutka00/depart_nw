@@ -315,8 +315,7 @@ async def help_message(app: Client, message: Message):
     if message.from_user.id in config.admins:
         text.append("\n<b>Команды для тех персонала:</b>")
         text.append("<code>/mailer [2 - без подписки, 1 - c подпиской, 0 - всем] [0 - оффициал канал, 1 - Оффициал Предствитель, 2 - Пустуо]</code>\n<code>/repair</code>\n<code>/parse</code>\n<code>/stop</code> - остановка бота\n<code>/send_log</code>\n<code>/stats</code> - статистика использований")
-    if inline.donate_kb():
-        text.append("\nВи можете надати гроші для сплати за сервер для роботи бота та підтримки адміністрації бота\n\n🔗Посилання на Банку\nhttps://send.monobank.ua/jar/6E85edaBFL\n\n💳Номер карти Банки\n<code>5375 4112 0229 7482</code>")
+    text.append("\n\nКнопкой ниже вы можете получить реквизиты для поддержки бота.")
     await app.send_message(message.from_user.id, '\n'.join(text), reply_markup=inline.donate_kb())
     await auto_delete.delete_command([mes, message])
     return
