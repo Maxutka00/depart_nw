@@ -13,7 +13,8 @@ async def start_parse(app: Client, message: Message):
     logger.loggers(message, text="used !parse")
     await message.delete()
     try:
-        parse.transport_parse()
+        pass
+        #parse.transport_parse()
     except Exception as e:
         await app.send_message(message.from_user.id, f"Ошибка при парсинге автобусов:\n{e}")
     threading.Thread(target=parse.electric_transport_parse).start()
