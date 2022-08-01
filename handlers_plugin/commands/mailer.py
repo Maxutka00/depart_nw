@@ -39,7 +39,6 @@ async def mailer(app: Client, message: Message):
 @Client.on_message(filters.command("mail"))
 async def sub_to_mail(app: Client, message: Message):
     logger.loggers(message, text="used !mail")
-    db.add_user(message.from_user.id)
     data = db.get_user_mail(message.from_user.id)
     db.set_user_mail(message.from_user.id, data is False)
     if data:
